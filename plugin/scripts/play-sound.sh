@@ -19,5 +19,8 @@ if [ ! -f "$SOUND" ]; then
   SOUND=$(grep "\"$HOOK\":" "$SETTINGS" | sed 's/.*": *"\(.*\)".*/\1/')
 fi
 
-[ -n "$SOUND" ] && [ -f "$SOUND" ] && afplay "$SOUND" &
+VOLUME=$(grep '"volume":' "$SETTINGS" | sed 's/.*: *\([0-9.]*\).*/\1/')
+VOLUME="${VOLUME:-0.2}"
+
+[ -n "$SOUND" ] && [ -f "$SOUND" ] && afplay -v "$VOLUME" "$SOUND" &
 exit 0

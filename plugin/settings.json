@@ -1,6 +1,7 @@
 {
   "sounds_enabled": true,
   "notifications_enabled": true,
+  "volume": 0.2,
   "hook_sounds": {
     "SessionStart":       "/System/Library/Sounds/Pop.aiff",
     "UserPromptSubmit":   "/System/Library/Sounds/Tink.aiff",

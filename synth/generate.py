@@ -13,7 +13,7 @@ from scipy.io.wavfile import write as wav_write
 from pathlib import Path
 
 SAMPLE_RATE = 44100
-AMPLITUDE = 0.10  # 10% peak
+AMPLITUDE = 0.70  # 70% peak
 
 
 # ── Primitives ────────────────────────────────────────────────────
