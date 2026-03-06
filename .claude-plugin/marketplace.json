@@ -1,0 +1,14 @@
+{
+  "name": "beepboop",
+  "owner": {
+    "name": "dan"
+  },
+  "plugins": [
+    {
+      "name": "beepboop",
+      "source": "./",
+      "description": "Plays sounds on Claude Code hook events and sends desktop notifications",
+      "version": "1.0.1"
+    }
+  ]
+}

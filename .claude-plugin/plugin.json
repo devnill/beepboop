@@ -1,0 +1,7 @@
+{
+  "name": "beepboop",
+  "version": "1.0.1",
+  "description": "Plays sounds on hooks and sends notifications when Claude needs attention",
+  "author": { "name": "dan" },
+  "license": "MIT"
+}

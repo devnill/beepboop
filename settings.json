@@ -1,0 +1,24 @@
+{
+  "sounds_enabled": true,
+  "notifications_enabled": true,
+  "hook_sounds": {
+    "SessionStart":       "/System/Library/Sounds/Pop.aiff",
+    "UserPromptSubmit":   "/System/Library/Sounds/Tink.aiff",
+    "PreToolUse":         "/System/Library/Sounds/Bottle.aiff",
+    "PermissionRequest":  "/System/Library/Sounds/Basso.aiff",
+    "PostToolUse":        "/System/Library/Sounds/Ping.aiff",
+    "PostToolUseFailure": "/System/Library/Sounds/Funk.aiff",
+    "Notification":       "/System/Library/Sounds/Glass.aiff",
+    "SubagentStart":      "/System/Library/Sounds/Purr.aiff",
+    "SubagentStop":       "/System/Library/Sounds/Hero.aiff",
+    "Stop":               "/System/Library/Sounds/Glass.aiff",
+    "TeammateIdle":       "/System/Library/Sounds/Morse.aiff",
+    "TaskCompleted":      "/System/Library/Sounds/Submarine.aiff",
+    "InstructionsLoaded": "/System/Library/Sounds/Blow.aiff",
+    "ConfigChange":       "/System/Library/Sounds/Frog.aiff",
+    "WorktreeCreate":     "/System/Library/Sounds/Sosumi.aiff",
+    "WorktreeRemove":     "/System/Library/Sounds/Tink.aiff",
+    "PreCompact":         "/System/Library/Sounds/Purr.aiff",
+    "SessionEnd":         "/System/Library/Sounds/Pop.aiff"
+  }
+}
