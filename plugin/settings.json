@@ -1,5 +1,6 @@
 {
   "sounds_enabled": true,
+  "player": "",
   "notifications_enabled": true,
   "volume": 0.2,
   "hook_sounds": {
