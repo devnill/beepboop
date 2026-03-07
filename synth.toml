@@ -1,0 +1,3 @@
+[synth]
+sounds_file = "sounds.py"
+output_dir = "plugin/sounds"

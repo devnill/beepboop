@@ -1,81 +1,14 @@
-#!/usr/bin/env python3
 """
-Beepboop Sound Generator
-Generates robot-style WAV files for all Claude Code hook events.
+Beepboop sound definitions.
 
-Output: synth/output/<HookName>.wav
-Run:    python synth/generate.py
-Deps:   pip install numpy scipy
+Imports synthesis primitives from the synth submodule.
+Run generate.sh (or `synth generate`) to produce WAV files in plugin/sounds/.
 """
 
 import numpy as np
-from scipy.io.wavfile import write as wav_write
-from pathlib import Path
+from synth import sine, square, sweep, fm, adsr, seq, silence, SAMPLE_RATE
+from synth.primitives import _t
 
-SAMPLE_RATE = 44100
-AMPLITUDE = 0.70  # 70% peak
-
-
-# ── Primitives ────────────────────────────────────────────────────
-
-def _t(duration: float) -> np.ndarray:
-    return np.linspace(0, duration, int(SAMPLE_RATE * duration), endpoint=False)
-
-
-def sine(freq: float, duration: float) -> np.ndarray:
-    return np.sin(2 * np.pi * freq * _t(duration))
-
-
-def square(freq: float, duration: float) -> np.ndarray:
-    return np.sign(np.sin(2 * np.pi * freq * _t(duration)))
-
-
-def sweep(f_start: float, f_end: float, duration: float, log: bool = False) -> np.ndarray:
-    """Frequency sweep via phase accumulation — no artifacts."""
-    n = int(SAMPLE_RATE * duration)
-    freqs = np.logspace(np.log10(f_start), np.log10(f_end), n) if log else np.linspace(f_start, f_end, n)
-    phase = 2 * np.pi * np.cumsum(freqs) / SAMPLE_RATE
-    return np.sin(phase)
-
-
-def fm(carrier: float, mod_freq: float, mod_index: float, duration: float) -> np.ndarray:
-    t = _t(duration)
-    return np.sin(2 * np.pi * carrier * t + mod_index * np.sin(2 * np.pi * mod_freq * t))
-
-
-def adsr(signal: np.ndarray, attack: float, decay: float, sustain: float, release: float) -> np.ndarray:
-    """Apply ADSR envelope with exponential curves. All times in seconds."""
-    n = len(signal)
-    a = int(attack * SAMPLE_RATE)
-    d = int(decay * SAMPLE_RATE)
-    r = int(release * SAMPLE_RATE)
-    s = max(0, n - a - d - r)
-
-    env = np.concatenate([
-        1 - np.exp(-5 * np.linspace(0, 1, a)) if a else [],
-        np.exp(-5 * np.linspace(0, 1, d)) * (1 - sustain) + sustain if d else [],
-        np.full(s, sustain),
-        np.linspace(sustain, 0, r) if r else [],
-    ])
-    return signal * env[:n]
-
-
-def silence(duration: float) -> np.ndarray:
-    return np.zeros(int(SAMPLE_RATE * duration))
-
-
-def seq(*parts: np.ndarray) -> np.ndarray:
-    return np.concatenate(parts)
-
-
-def save(path: Path, signal: np.ndarray) -> None:
-    signal = np.clip(signal * AMPLITUDE, -1.0, 1.0)
-    data = (signal * np.iinfo(np.int16).max).astype(np.int16)
-    wav_write(str(path), SAMPLE_RATE, data)
-    print(f"  ✓  {path.name}")
-
-
-# ── Sound generators ──────────────────────────────────────────────
 
 def session_start() -> np.ndarray:
     """Warm startup chirp: low boop then rising sweep."""
@@ -191,7 +124,7 @@ def worktree_remove() -> np.ndarray:
     duration = 0.30
     t = _t(duration)
     freqs = np.logspace(np.log10(700), np.log10(200), len(t))
-    wobble = 12 * np.sin(2 * np.pi * 18 * t) * (1 - t / duration)  # wobble fades as pitch falls
+    wobble = 12 * np.sin(2 * np.pi * 18 * t) * (1 - t / duration)
     phase = 2 * np.pi * np.cumsum(freqs + wobble) / SAMPLE_RATE
     return adsr(np.sin(phase), 0.005, 0.05, 0.5, 0.12)
 
@@ -201,7 +134,7 @@ def pre_compact() -> np.ndarray:
     duration = 0.35
     t = _t(duration)
     freqs = np.linspace(800, 300, len(t))
-    wobble = 60 * np.sin(2 * np.pi * 25 * t)  # fast 25Hz wobble = busy processing chatter
+    wobble = 60 * np.sin(2 * np.pi * 25 * t)
     phase = 2 * np.pi * np.cumsum(freqs + wobble) / SAMPLE_RATE
     return adsr(np.sin(phase), 0.005, 0.06, 0.6, 0.10)
 
@@ -212,8 +145,6 @@ def session_end() -> np.ndarray:
     boop = adsr(sine(280, 0.14), 0.005, 0.10, 0.0, 0.05)
     return seq(fall, silence(0.04), boop) * 0.85
 
-
-# ── Registry & main ───────────────────────────────────────────────
 
 SOUNDS = {
     "SessionStart":         session_start,
@@ -235,13 +166,3 @@ SOUNDS = {
     "PreCompact":           pre_compact,
     "SessionEnd":           session_end,
 }
-
-if __name__ == "__main__":
-    output_dir = Path(__file__).parent / "output"
-    output_dir.mkdir(exist_ok=True)
-
-    print(f"Generating {len(SOUNDS)} sounds → {output_dir}\n")
-    for name, fn in SOUNDS.items():
-        save(output_dir / f"{name}.wav", fn())
-
-    print(f"\nDone! Preview with:\n  afplay {output_dir}/SessionStart.wav")
