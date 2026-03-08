@@ -12,6 +12,8 @@ TITLE="${1:-Claude Code}"
 BODY="${2:-}"
 SETTINGS="${CLAUDE_PLUGIN_ROOT}/settings.json"
 
+# Skip when running without a controlling terminal (e.g. claude -p subprocess)
+(true > /dev/tty) 2>/dev/null || exit 0
 [ -f "$SETTINGS" ] && grep -q '"notifications_enabled": *false' "$SETTINGS" && exit 0
 
 if [ -n "$GHOSTTY_RESOURCES_DIR" ]; then
