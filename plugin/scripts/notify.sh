@@ -1,37 +1,67 @@
 #!/bin/sh
-# Send a desktop notification with terminal-aware degradation.
+# Send a desktop notification via OSC escape sequences.
 # Usage: notify.sh <title> <body>
 #
-# Detection order:
-#   1. Ghostty  (GHOSTTY_RESOURCES_DIR set)   -> OSC 777
-#   2. VSCode   (TERM_PROGRAM=vscode)         -> OSC 9
-#   3. iTerm2   (TERM_PROGRAM=iTerm.app)      -> OSC 9
-#   4. WezTerm  (WEZTERM_EXECUTABLE set)      -> OSC 9
-#   5. Fallback                               -> osascript (macOS, focuses terminal on click)
+# Terminals:
+#   - Ghostty: OSC 777 (notify;title;body)
+#   - iTerm2/VSCode/WezTerm: OSC 9 (title: body)
+#   - tmux/screen: wrap OSC in DCS passthrough
+#   - Unknown + macOS: fallback to osascript or terminal-notifier
+
 TITLE="${1:-Claude Code}"
 BODY="${2:-}"
 SETTINGS="${CLAUDE_PLUGIN_ROOT}/settings.json"
 
-# Skip when running without a controlling terminal (e.g. claude -p subprocess)
-(true > /dev/tty) 2>/dev/null || exit 0
+# Skip if explicitly disabled
 [ -f "$SETTINGS" ] && grep -q '"notifications_enabled": *false' "$SETTINGS" && exit 0
 
-if [ -n "$GHOSTTY_RESOURCES_DIR" ]; then
-    printf '\033]777;notify;%s;%s\a' "$TITLE" "$BODY" > /dev/tty
-elif [ "$TERM_PROGRAM" = "vscode" ]; then
-    printf '\033]9;%s\a' "$TITLE: $BODY" > /dev/tty
-elif [ "$TERM_PROGRAM" = "iTerm.app" ]; then
-    printf '\033]9;%s\a' "$TITLE: $BODY" > /dev/tty
-elif [ -n "$WEZTERM_EXECUTABLE" ]; then
-    printf '\033]9;%s\a' "$TITLE: $BODY" > /dev/tty
-else
-    case "$TERM_PROGRAM" in
-        Apple_Terminal) TERM_APP="Terminal" ;;
-        iTerm.app)      TERM_APP="iTerm2" ;;
-        Hyper)          TERM_APP="Hyper" ;;
-        *)              TERM_APP="Terminal" ;;
+# Check if we're in a known terminal that supports OSC
+is_known_terminal() {
+    [ -n "$GHOSTTY_RESOURCES_DIR" ] && return 0
+    [ "$TERM_PROGRAM" = "iTerm.app" ] && return 0
+    [ "$TERM_PROGRAM" = "vscode" ] && return 0
+    [ "$TERM_PROGRAM" = "Apple_Terminal" ] && return 0
+    [ "$TERM_PROGRAM" = "Hyper" ] && return 0
+    [ -n "$WEZTERM_EXECUTABLE" ] && return 0
+    case "$TERM" in tmux*|screen*) return 0 ;; esac
+    [ -n "$TMUX" ] && return 0
+    return 1
+}
+
+# Build the OSC sequence
+build_osc() {
+    if [ -n "$GHOSTTY_RESOURCES_DIR" ]; then
+        printf '\033]777;notify;%s;%s\a' "$TITLE" "$BODY"
+    else
+        printf '\033]9;%s: %s\a' "$TITLE" "$BODY"
+    fi
+}
+
+# Fallback for macOS with unknown terminal
+macos_fallback() {
+    # Prefer terminal-notifier if available (doesn't open Script Editor on click)
+    if command -v terminal-notifier >/dev/null 2>&1; then
+        terminal-notifier -title "$TITLE" -message "$BODY" 2>/dev/null
+        return
+    fi
+    # Fall back to osascript (clicking opens Script Editor)
+    osascript -e "display notification \"$BODY\" with title \"$TITLE\"" 2>/dev/null
+}
+
+# Main logic
+if is_known_terminal; then
+    SEQ="$(build_osc)"
+    # Wrap in DCS passthrough for tmux/screen
+    case "$TERM" in
+        tmux*|screen*)
+            printf '\033Ptmux;\033%s\033\\' "$SEQ"
+            ;;
+        *)
+            printf '%s' "$SEQ"
+            ;;
     esac
-    osascript -e "tell application \"$TERM_APP\" to display notification \"$BODY\" with title \"$TITLE\""
+elif [ "$(uname)" = "Darwin" ]; then
+    macos_fallback
 fi
 
 exit 0
