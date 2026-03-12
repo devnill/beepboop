@@ -1,12 +1,7 @@
 #!/bin/sh
 # Send a desktop notification via OSC escape sequences.
-# Usage: notify.sh <title> <body>
-#
-# Terminals:
-#   - Ghostty: OSC 777 (notify;title;body)
-#   - iTerm2/VSCode/WezTerm: OSC 9 (title: body)
-#   - tmux/screen: wrap OSC in DCS passthrough
-#   - Unknown + macOS: fallback to osascript or terminal-notifier
+# Priority: OSC 777 > OSC 9 > osascript (macOS fallback)
+# Multiplexers: wraps sequences in DCS passthrough for tmux and GNU screen.
 
 TITLE="${1:-Claude Code}"
 BODY="${2:-}"
@@ -15,53 +10,70 @@ SETTINGS="${CLAUDE_PLUGIN_ROOT}/settings.json"
 # Skip if explicitly disabled
 [ -f "$SETTINGS" ] && grep -q '"notifications_enabled": *false' "$SETTINGS" && exit 0
 
-# Check if we're in a known terminal that supports OSC
-is_known_terminal() {
-    [ -n "$GHOSTTY_RESOURCES_DIR" ] && return 0
-    [ "$TERM_PROGRAM" = "iTerm.app" ] && return 0
-    [ "$TERM_PROGRAM" = "vscode" ] && return 0
-    [ "$TERM_PROGRAM" = "Apple_Terminal" ] && return 0
-    [ "$TERM_PROGRAM" = "Hyper" ] && return 0
-    [ -n "$WEZTERM_EXECUTABLE" ] && return 0
-    case "$TERM" in tmux*|screen*) return 0 ;; esac
+# --- Multiplexer detection ---
+
+in_tmux() {
     [ -n "$TMUX" ] && return 0
+    case "$TERM" in tmux*) return 0 ;; esac
     return 1
 }
 
-# Build the OSC sequence
-build_osc() {
-    if [ -n "$GHOSTTY_RESOURCES_DIR" ]; then
-        printf '\033]777;notify;%s;%s\a' "$TITLE" "$BODY"
+in_screen() {
+    [ -n "$STY" ] && return 0
+    case "$TERM" in screen*) return 0 ;; esac
+    return 1
+}
+
+# --- OSC capability of the outer terminal ---
+# Returns: "osc777", "osc9", or "none"
+
+osc_type() {
+    # OSC 777: Ghostty
+    [ -n "$GHOSTTY_RESOURCES_DIR" ] && echo "osc777" && return
+    # OSC 9: iTerm2, WezTerm, VSCode, Hyper
+    [ "$TERM_PROGRAM" = "iTerm.app" ] && echo "osc9" && return
+    [ -n "$WEZTERM_EXECUTABLE" ] && echo "osc9" && return
+    [ "$TERM_PROGRAM" = "vscode" ] && echo "osc9" && return
+    [ "$TERM_PROGRAM" = "Hyper" ] && echo "osc9" && return
+    echo "none"
+}
+
+# --- Sequence builders ---
+
+build_osc777() { printf '\033]777;notify;%s;%s\a' "$TITLE" "$BODY"; }
+build_osc9()   { printf '\033]9;%s: %s\a' "$TITLE" "$BODY"; }
+
+# --- Output with optional DCS passthrough ---
+
+send_seq() {
+    seq="$1"
+    if in_tmux; then
+        # tmux requires inner ESC to be doubled
+        printf '\033Ptmux;\033%s\033\\' "$seq"
+    elif in_screen; then
+        printf '\033P%s\033\\' "$seq"
     else
-        printf '\033]9;%s: %s\a' "$TITLE" "$BODY"
+        printf '%s' "$seq"
     fi
 }
 
-# Fallback for macOS with unknown terminal
-macos_fallback() {
-    # Prefer terminal-notifier if available (doesn't open Script Editor on click)
+# --- macOS fallback ---
+
+macos_notify() {
     if command -v terminal-notifier >/dev/null 2>&1; then
         terminal-notifier -title "$TITLE" -message "$BODY" 2>/dev/null
         return
     fi
-    # Fall back to osascript (clicking opens Script Editor)
     osascript -e "display notification \"$BODY\" with title \"$TITLE\"" 2>/dev/null
 }
 
-# Main logic
-if is_known_terminal; then
-    SEQ="$(build_osc)"
-    # Wrap in DCS passthrough for tmux/screen
-    case "$TERM" in
-        tmux*|screen*)
-            printf '\033Ptmux;\033%s\033\\' "$SEQ"
-            ;;
-        *)
-            printf '%s' "$SEQ"
-            ;;
-    esac
-elif [ "$(uname)" = "Darwin" ]; then
-    macos_fallback
-fi
+# --- Main ---
+
+TYPE="$(osc_type)"
+case "$TYPE" in
+    osc777) send_seq "$(build_osc777)" ;;
+    osc9)   send_seq "$(build_osc9)" ;;
+    none)   [ "$(uname)" = "Darwin" ] && macos_notify ;;
+esac
 
 exit 0
