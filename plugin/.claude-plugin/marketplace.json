@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "Beepboop plugin marketplace",
-    "version": "1.3.1"
+    "version": "1.3.2"
   },
   "plugins": [
     {
       "name": "beepboop",
       "source": "./",
       "description": "Plays sounds on Claude Code hook events and sends desktop notifications",
-      "version": "1.3.1"
+      "version": "1.3.2"
     }
   ]
 }

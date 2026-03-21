@@ -49,11 +49,11 @@ send_seq() {
     seq="$1"
     if in_tmux; then
         # tmux requires inner ESC to be doubled
-        printf '\033Ptmux;\033%s\033\\' "$seq"
+        printf '\033Ptmux;\033%s\033\\' "$seq" > /dev/tty
     elif in_screen; then
-        printf '\033P%s\033\\' "$seq"
+        printf '\033P%s\033\\' "$seq" > /dev/tty
     else
-        printf '%s' "$seq"
+        printf '%s' "$seq" > /dev/tty
     fi
 }
 
@@ -73,7 +73,13 @@ TYPE="$(osc_type)"
 case "$TYPE" in
     osc777) send_seq "$(build_osc777)" ;;
     osc9)   send_seq "$(build_osc9)" ;;
-    none)   [ "$(uname)" = "Darwin" ] && macos_notify ;;
+    none)   ;;
 esac
+
+# On macOS, always fire a system notification as a reliable fallback.
+# OSC passthrough in tmux requires `set -g allow-passthrough on` in .tmux.conf
+# (disabled by default since tmux 3.3), so system notifications are the only
+# guaranteed path inside tmux.
+[ "$(uname)" = "Darwin" ] && macos_notify
 
 exit 0
