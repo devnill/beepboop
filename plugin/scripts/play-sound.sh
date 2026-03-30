@@ -56,11 +56,11 @@ if [ -z "$PLAYER" ]; then
   PLAYER=$(detect_player)
   if [ -n "$PLAYER" ]; then
     python3 -c "
-import json
-with open('$SETTINGS') as f: cfg = json.load(f)
-cfg['player'] = '$PLAYER'
-with open('$SETTINGS', 'w') as f: json.dump(cfg, f, indent=2)
-" 2>/dev/null
+import json, sys
+with open(sys.argv[1]) as f: cfg = json.load(f)
+cfg['player'] = sys.argv[2]
+with open(sys.argv[1], 'w') as f: json.dump(cfg, f, indent=2)
+" "$SETTINGS" "$PLAYER" 2>/dev/null
   fi
 fi
 
@@ -71,7 +71,29 @@ fi
 PLAYER_BIN=$(basename "$PLAYER")
 case "$PLAYER_BIN" in
   afplay)
-    "$PLAYER" -v "$VOLUME" "$SOUND" &
+    uid=$(python3 -c 'import os; print(os.getuid())')
+    socket_path="/tmp/beepboop-${uid}.sock"
+    (
+      if [ ! -S "$socket_path" ]; then
+        python3 "${PLUGIN_ROOT}/scripts/beepboop-daemon.py" &
+        i=0
+        while [ $i -lt 10 ] && [ ! -S "$socket_path" ]; do
+          sleep 0.05; i=$((i+1))
+        done
+        [ -S "$socket_path" ] || exit 0
+      fi
+      python3 -c "
+import socket, json, sys
+try:
+    d = json.dumps({'path': sys.argv[1], 'volume': float(sys.argv[2])}).encode()
+    s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    s.connect(sys.argv[3])
+    s.sendall(d + b'\n')
+    s.close()
+except Exception:
+    pass
+" "$SOUND" "$VOLUME" "$socket_path"
+    ) 2>/dev/null &
     ;;
   paplay)
     PA_VOL=$(python3 -c "print(int($VOLUME * 65536))" 2>/dev/null || echo "13107")

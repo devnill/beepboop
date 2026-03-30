@@ -1,0 +1,9 @@
+id: decision-log-full-audit
+type: cycle_summary
+scope: full-audit
+date: "20260329"
+reviewer: journal-keeper
+content: "See open questions OQ-01 through OQ-12. Critical: TOCTOU daemon startup race (OQ-01). Significant: 500ms sync wait GP-05 violation (OQ-02), IPC traceback exposure P-2 violation (OQ-03), StopFailure missing notification (OQ-04), settings.json missing 7 hooks (OQ-05), SessionEnd && chain skips daemon stop (OQ-07), PID removed before daemon exits (OQ-08). Minor: test-sounds.sh missing 7 hooks (OQ-06), P-1 text vs GP-01 amendment (OQ-09), README stale (OQ-10), .pyc in repo (OQ-11)."
+content_hash: 27dc2f193737f3461e3dd49a8da7297fcbc36852c8d5d61ab58b09d87119ff15
+token_count: 150
+file_path: .ideate/cycles/000/decision-log-full-audit.yaml

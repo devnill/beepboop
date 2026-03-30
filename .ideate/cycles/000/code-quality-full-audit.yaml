@@ -1,0 +1,26 @@
+id: code-quality-full-audit
+type: cycle_summary
+scope: full-audit
+date: "20260329"
+reviewer: code-reviewer
+verdict: Fail
+content: |-
+  ## Critical
+  C1: TOCTOU race on concurrent daemon startup — two rapid hooks firing before socket exists both pass the PID guard, second daemon unlinks first daemon’s socket leaving it unreachable (beepboop-daemon.py:368-375)
+
+  ## Significant
+  S1: Daemon startup blocks hook for up to 500ms — synchronous while-loop in play-sound.sh:76-82, violates GP-05
+  S2: IPC python3 client has no try/except and no 2>/dev/null — crashed daemon produces Python traceback on stderr, violates P-2
+  S3: SessionEnd hook uses && chain — if play-sound.sh exits non-zero, stop-daemon.sh is skipped; use semicolons
+  S4: stop-daemon.sh removes PID file before daemon exits — new session can start second daemon while old one still shutting down
+
+  ## Minor
+  M1: _elapsed_samples() defined but never called (dead code)
+  M2: _pending_start_sample set but never read
+  M3: sys.exit(0) in fork parents should be os._exit(0)
+  M4: test-sounds.sh HOOKS array missing 7 new hooks
+  M5: Daemon does not chdir('/') after daemonizing
+  M6: $PLAYER interpolated into python3 -c string literal without escaping (play-sound.sh:58-64)
+content_hash: 2014becd551a95bd72a28b41773ff88988a03778a9fb48109b8a6f35b5003236
+token_count: 310
+file_path: .ideate/cycles/000/code-quality-full-audit.yaml

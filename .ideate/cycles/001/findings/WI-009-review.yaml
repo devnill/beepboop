@@ -1,0 +1,29 @@
+id: WI-009-review
+type: finding
+work_item: WI-009
+reviewer: incremental
+verdict: pass
+findings:
+  critical: []
+  significant: []
+  minor: []
+self_check_verification:
+  - criterion: Poll loop present checking for PID file disappearance after SIGTERM
+    status: satisfied
+    verified: true
+  - criterion: Poll loop runs at most 20 iterations with sleep 0.05
+    status: satisfied
+    verified: true
+  - criterion: Script exits 0 if PID file absent on entry
+    status: satisfied
+    verified: true
+  - criterion: rm -f pid_file only after poll loop as fallback
+    status: satisfied
+    verified: true
+  - criterion: socket_path variable defined from uid
+    status: satisfied
+    verified: true
+notes: "Poll loop: 'while [ $i -lt 20 ] && [ -f pid_file ]; do sleep 0.05; i=$((i+1)); done' — confirmed. rm -f only after loop. Guard '[ -f pid_file ] || exit 0' at top. socket_path defined at line 4."
+content_hash: 42f8672f52d9871c3f56a8591e4d66cdee258760c0373f4d31f760d545dcbc94
+token_count: 224
+file_path: .ideate/cycles/001/findings/WI-009-review.yaml

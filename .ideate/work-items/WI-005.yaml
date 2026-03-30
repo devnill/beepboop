@@ -1,0 +1,50 @@
+id: WI-005
+type: work_item
+title: Regenerate WAV files for all 25 hooks
+status: pending
+complexity: low
+scope:
+  - path: plugin/sounds/StopFailure.wav
+    op: create
+  - path: plugin/sounds/TaskCreated.wav
+    op: create
+  - path: plugin/sounds/PostCompact.wav
+    op: create
+  - path: plugin/sounds/CwdChanged.wav
+    op: create
+  - path: plugin/sounds/FileChanged.wav
+    op: create
+  - path: plugin/sounds/Elicitation.wav
+    op: create
+  - path: plugin/sounds/ElicitationResult.wav
+    op: create
+depends:
+  - WI-002
+  - WI-003
+  - WI-004
+blocks: []
+criteria:
+  - All 7 new WAV files exist in plugin/sounds/ with correct PascalCase names [machine]
+  - Each WAV file is valid 16-bit PCM at 44100 Hz [machine]
+  - generate.sh runs to completion without errors [machine]
+  - plugin/sounds/ contains exactly 25 WAV files [machine]
+domain: sound-design
+notes: |-
+  ## Objective
+  Run the build pipeline to produce WAV files for all 25 hook sounds (7 new + 18 regenerated).
+
+  ## Steps
+  1. `git submodule update --init synth/`
+  2. `bash generate.sh`
+  3. `ls plugin/sounds/*.wav | wc -l` — should return 25
+  4. Verify new files: `ls plugin/sounds/StopFailure.wav plugin/sounds/CwdChanged.wav plugin/sounds/FileChanged.wav plugin/sounds/Elicitation.wav plugin/sounds/ElicitationResult.wav plugin/sounds/TaskCreated.wav plugin/sounds/PostCompact.wav`
+  5. Commit all new and changed WAV files.
+
+  ## Notes
+  generate.sh installs synth with `pip install -e synth/` then runs `synth generate --config synth.toml`. The CLI reads sounds.py and writes one WAV per SOUNDS entry. Existing 18 WAVs are overwritten — this is expected.
+resolution: null
+cycle_created: 0
+cycle_modified: null
+content_hash: 09bf742b2c7e42ae2364182f49c8c0aef9b04eb52f7da13629c1be214d58abe5
+token_count: 420
+file_path: /Users/dan/code/beepboop/.ideate/work-items/WI-005.yaml

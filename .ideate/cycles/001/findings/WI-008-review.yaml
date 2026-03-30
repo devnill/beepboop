@@ -1,0 +1,29 @@
+id: WI-008-review
+type: finding
+work_item: WI-008
+reviewer: incremental
+verdict: pass
+findings:
+  critical: []
+  significant: []
+  minor: []
+self_check_verification:
+  - criterion: SessionEnd command uses ; not && between play-sound.sh, sleep 0.3, stop-daemon.sh
+    status: satisfied
+    verified: true
+  - criterion: StopFailure command chains notify.sh with 'Task failed'
+    status: satisfied
+    verified: true
+  - criterion: StopFailure hook timeout is 10
+    status: satisfied
+    verified: true
+  - criterion: hooks.json is valid JSON
+    status: satisfied
+    verified: true
+  - criterion: All other hooks unchanged
+    status: satisfied
+    verified: true
+notes: "SessionEnd confirmed: 'play-sound.sh SessionEnd; sleep 0.3; stop-daemon.sh' — unconditional chaining ensures daemon always stops. StopFailure timeout=10, chains notify.sh with message 'Task failed' using && (consistent with Stop hook pattern). JSON parses cleanly."
+content_hash: 880e6b31f224cf1dda9dcec7c4cf74aad6343801d1fc99df71e70ff75005f606
+token_count: 235
+file_path: .ideate/cycles/001/findings/WI-008-review.yaml

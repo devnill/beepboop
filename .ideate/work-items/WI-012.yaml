@@ -1,0 +1,66 @@
+id: WI-012
+type: work_item
+title: Update README to document 25 hooks and daemon; amend P-1 policy
+status: completed
+complexity: low
+scope:
+  - path: README.md
+    op: modify
+  - path: .ideate/policies/P-1.yaml
+    op: modify
+depends: []
+blocks: []
+criteria:
+  - "README.md does not contain '18 Claude Code hook' [machine: grep returns 0 matches]"
+  - "README.md contains '25 Claude Code hook' [machine: grep returns 1 match]"
+  - "README.md contains a section heading for the audio daemon (## Audio Daemon or ## Audio Mixing Daemon) [machine: grep]"
+  - "Daemon section documents socket path /tmp/beepboop-<uid>.sock [machine: grep]"
+  - "Daemon section documents PID path /tmp/beepboop-<uid>.pid [machine: grep]"
+  - "Daemon section includes command to check if daemon is running [machine: grep for ps aux or equivalent]"
+  - "Daemon section includes manual stop command [machine: grep for kill command]"
+  - "P-1.yaml rule field does NOT contain 'no harsh alarms' [machine: grep]"
+  - "P-1.yaml rule field contains 'alarmed' or 'tense' permitting error-event sounds [machine: grep]"
+  - "P-1.yaml rule field still requires synthesized sounds [machine: grep for 'synthesized']"
+  - "P-1.yaml amended_by field is non-null [machine: grep]"
+domain: sound-design
+notes: |-
+  ## README.md changes (MI1)
+  1. Replace '18 Claude Code hook events' with '25 Claude Code hook events'
+  2. Add section after Notifications section:
+
+  ## Audio Daemon (macOS)
+
+  On macOS, beepboop uses a persistent audio mixing daemon (`beepboop-daemon.py`) to prevent audio corruption when multiple hooks fire in quick succession. Instead of spawning multiple `afplay` processes, all sounds are mixed into a single stream.
+
+  - **Socket**: `/tmp/beepboop-<uid>.sock`
+  - **PID file**: `/tmp/beepboop-<uid>.pid`
+  - Auto-starts on the first hook event that plays a sound
+  - Automatically stopped on `SessionEnd`
+
+  ### Manual management
+
+  Check if running:
+  ```sh
+  ps aux | grep beepboop-daemon
+  ```
+
+  Stop manually:
+  ```sh
+  kill $(cat /tmp/beepboop-$(id -u).pid)
+  ```
+
+  The daemon auto-starts on the next hook event.
+
+  ## P-1.yaml changes (MI2)
+  Update rule field from:
+    'All sounds must be synthesized (not recorded) and carry a pleasant, robotic personality — melodic tones, chirps, and bleeps in the R2D2 register; no harsh alarms, natural sounds, or generic beeps.'
+  to:
+    'All sounds must be synthesized (not recorded) and carry a robotic personality — melodic tones, chirps, and bleeps in the R2D2 register; no natural sounds or generic beeps. Sounds for error and urgent-attention events may be more alarmed or tense in character.'
+
+  Set amended_by to WI-012, set cycle_modified to 1.
+resolution: README updated to 25 hooks with Audio Daemon section. P-1.yaml rule amended to permit alarmed/tense sounds for error events; amended_by=WI-012.
+cycle_created: 1
+cycle_modified: 0
+content_hash: ebf4c327a70852de54933cd88e0bf05398a5d0087c90ea023b913e54c560c7fb
+token_count: 719
+file_path: /Users/dan/code/beepboop/.ideate/work-items/WI-012.yaml

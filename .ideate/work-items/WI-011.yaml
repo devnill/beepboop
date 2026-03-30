@@ -1,0 +1,40 @@
+id: WI-011
+type: work_item
+title: Update test-sounds.sh to cover all 25 hooks; untrack committed .pyc
+status: completed
+complexity: low
+scope:
+  - path: plugin/scripts/test-sounds.sh
+    op: modify
+  - path: .gitignore
+    op: modify
+depends: []
+blocks: []
+criteria:
+  - "test-sounds.sh HOOKS array contains exactly 25 entries [machine: count entries between HOOKS=( and )]"
+  - "All 7 new hook names present in HOOKS: StopFailure, TaskCreated, PostCompact, CwdChanged, FileChanged, Elicitation, ElicitationResult [machine: grep each]"
+  - ".gitignore contains __pycache__/ pattern [machine: grep]"
+  - "plugin/scripts/__pycache__/beepboop-daemon.cpython-314.pyc is not tracked by git [machine: git ls-files plugin/scripts/__pycache__/ returns empty]"
+  - "No other changes to test-sounds.sh beyond the 7 new entries [machine: diff]"
+domain: plugin-runtime
+notes: |-
+  ## test-sounds.sh
+  Add the 7 new hooks after SessionEnd in the HOOKS array:
+    StopFailure
+    TaskCreated
+    PostCompact
+    CwdChanged
+    FileChanged
+    Elicitation
+    ElicitationResult
+
+  ## .gitignore / .pyc removal
+  The .gitignore already has __pycache__/ and *.pyc patterns — no content change needed.
+  Run: git rm --cached plugin/scripts/__pycache__/beepboop-daemon.cpython-314.pyc
+  This untracks the committed bytecode. The file stays on disk.
+resolution: 25 hooks in HOOKS array. .pyc untracked (git rm --cached). .gitignore already had __pycache__/ pattern.
+cycle_created: 1
+cycle_modified: 0
+content_hash: 430445ab746e37915ca77b3545540712f98c874a0ff86c2d23ed9a2509e399cd
+token_count: 370
+file_path: /Users/dan/code/beepboop/.ideate/work-items/WI-011.yaml

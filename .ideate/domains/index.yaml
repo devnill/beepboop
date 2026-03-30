@@ -1,0 +1,13 @@
+id: domain-index
+type: domain_index
+current_cycle: 0
+domains:
+  - name: sound-design
+    description: Sound synthesis, acoustic character, the synth library relationship, and the 18-event sound set.
+  - name: plugin-runtime
+    description: Hook dispatch, audio playback, notification delivery, platform compatibility, and graceful degradation.
+  - name: configuration
+    description: User-facing settings, the /beepboop:config slash command, defaults, and setup experience.
+content_hash: b14290a044b94f85cbe58db1da9db9ac9f1d0f396b3f437d7861004546af493d
+token_count: 119
+file_path: .ideate/domains/index.yaml

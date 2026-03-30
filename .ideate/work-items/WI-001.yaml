@@ -1,0 +1,56 @@
+id: WI-001
+type: work_item
+title: Audio mixing daemon for macOS
+status: pending
+complexity: high
+scope:
+  - path: plugin/scripts/beepboop-daemon.py
+    op: create
+depends: []
+blocks:
+  - WI-002
+  - WI-003
+criteria:
+  - plugin/scripts/beepboop-daemon.py exists and is executable [machine]
+  - Daemon listens on Unix domain socket at /tmp/beepboop-$UID.sock [machine]
+  - 'Daemon accepts sound requests as newline-delimited JSON: {"path": "<abs-path>", "volume": <float>} [machine]'
+  - At most one afplay process is active at any time during concurrent sound requests [machine]
+  - Multiple sounds requested within a short window play as blended audio without audio corruption on macOS [human]
+  - Daemon writes its PID to /tmp/beepboop-$UID.pid on startup [machine]
+  - Daemon exits cleanly on SIGTERM, removing socket and PID files [machine]
+  - If daemon is already running (PID file exists and process is live), a second start attempt is a no-op [machine]
+  - Uses only Python3 stdlib modules (wave, array, socket, threading, subprocess, os, signal, struct, tempfile) — no pip packages [machine]
+  - Daemon detaches from the calling process and does not block the shell that starts it [machine]
+domain: plugin-runtime
+notes: |-
+  ## Objective
+  Create a persistent background daemon that receives sound play requests via a Unix domain socket and plays them as a single mixed audio stream via afplay, eliminating simultaneous afplay processes that corrupt macOS audio.
+
+  ## IPC Protocol
+  Unix domain socket at `/tmp/beepboop-{uid}.sock` (use `os.getuid()`). Each request is a JSON line: `{"path": "/abs/path/Sound.wav", "volume": 0.8}`. Client writes the line and closes. Server sends no response.
+
+  ## Mixing Architecture
+  Maintain a rolling sample buffer using Python `array` module (typecode `'h'`, int16). Two threads:
+  1. **Socket listener thread**: accepts connections, parses requests, reads WAV via `wave` module, mixes samples into shared buffer at current write-head position.
+  2. **Playback thread**: reads ahead of the play-head, writes mixed PCM to afplay (via temp WAV file or named FIFO if afplay supports it), advances play-head.
+
+  Mixing: sum samples across all active waveforms. Clip to int16 range: `max(-32767, min(32767, sample_sum))`. Apply volume scaling per sound before mixing.
+
+  Alternative simpler approach if streaming is complex: "interrupt and remix" — when new sound arrives during playback, kill current afplay, mix remaining samples + new sound samples, write combined WAV to temp file, start new afplay.
+
+  ## WAV Reading
+  `wave.open(path)` — all bundled sounds are 16-bit PCM 44100 Hz. Read frames as bytes, convert via `array.frombytes()`. Multiply each sample by volume float.
+
+  ## Daemon Lifecycle
+  - Check PID file on start. If process already alive (`os.kill(pid, 0)` succeeds), exit no-op.
+  - Daemonize: `os.fork()` + `os.setsid()` double-fork pattern.
+  - SIGTERM handler: close socket, delete socket file and PID file, stop threads, exit.
+
+  ## macOS Only
+  Uses afplay. No Linux/WSL code paths.
+resolution: null
+cycle_created: 0
+cycle_modified: null
+content_hash: f56016e2e87703c61176b200f9d803a2fe2723c178295487582e951d6aa4efac
+token_count: 777
+file_path: /Users/dan/code/beepboop/.ideate/work-items/WI-001.yaml

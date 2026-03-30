@@ -1,0 +1,13 @@
+id: D-1
+type: domain_decision
+domain: sound-design
+title: Build-time Python, Runtime Shell Split
+decision: Sound synthesis runs at build time via Python+synth; the plugin runtime is shell-only with pre-generated WAV files.
+rationale: Keeps runtime dependencies minimal (no Python packages required) while allowing expressive programmatic sound design during the build step.
+source: architect analysis
+status: settled
+cycle_created: 0
+cycle_modified: null
+content_hash: 35ae18c7a6b4cf2dec394ec9babfd2deac6e7af458fd20c5afe3a80ee6e7b157
+token_count: 113
+file_path: .ideate/decisions/D-1.yaml

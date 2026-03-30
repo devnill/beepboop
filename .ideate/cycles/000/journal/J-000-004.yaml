@@ -1,0 +1,14 @@
+id: J-000-004
+type: journal_entry
+phase: execute
+date: 2026-03-29
+cycle_created: 0
+title: work-item-complete
+content: >-
+  ## [execute] 2026-03-29 — Work item WI-002: Update play-sound.sh to use mixing
+  daemon on macOS
+
+  Status: complete
+
+  macOS afplay branch replaced with daemon IPC. Auto-start with 500ms poll.
+  Fire-and-forget via &. Non-macOS paths unchanged. No findings.

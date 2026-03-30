@@ -1,0 +1,72 @@
+id: J-000-008
+type: journal_entry
+phase: review
+date: 2026-03-29
+cycle_created: 0
+title: full-audit-complete
+content: >-
+  ## [review] 2026-03-29 — Full Audit Complete
+
+
+  Trigger: User requested adherence audit against all guiding principles and
+  domain policies after Cycle 0 execution (WI-001 through WI-005).
+
+
+  Reviewers: code-reviewer (FAIL), spec-reviewer (PASS), gap-analyst (FAIL)
+
+
+  ### Critical
+
+  - C1 (code): TOCTOU race on concurrent daemon startup — two hooks firing
+  before socket exists both pass PID guard; second daemon unlinks first daemon's
+  socket (beepboop-daemon.py:368-375)
+
+
+  ### Significant (address in next cycle)
+
+  - S1/EC1: 500ms synchronous wait in play-sound.sh when daemon absent — GP-05
+  violation; repeats on every hook if daemon fails to start
+
+  - S2: IPC python3 client has no try/except — Python traceback exposed to user
+  on daemon crash — P-2 violation
+
+  - S3: SessionEnd && chain skips stop-daemon.sh if play-sound.sh exits non-zero
+
+  - S4: stop-daemon.sh removes PID before daemon confirms exit — startup race
+  window
+
+  - MR1 (gap): StopFailure not wired to notify.sh — task failure produces no
+  notification; asymmetric with Stop
+
+  - II1/SIG-1: settings.json hook_sounds missing 7 new hooks — /beepboop:config
+  show broken (P-4)
+
+
+  ### Minor
+
+  - test-sounds.sh HOOKS array missing 7 new hooks (M4/II2)
+
+  - P-1 policy text not updated to reflect GP-01 amendment allowing alarmed
+  sounds for errors
+
+  - README says 18 hooks; daemon undocumented (MI1)
+
+  - dead code: _elapsed_samples(), _pending_start_sample (M1/M2)
+
+  - sys.exit() should be os._exit() in fork parents (M3)
+
+  - daemon does not chdir('/') after daemonizing (M5)
+
+  - $PLAYER interpolated unsafely in python3 -c string (M6)
+
+  - compiled .pyc committed to repo (MIN-2)
+
+
+  ### Deferred
+
+  - WAV format validation, sleep 0.3 cutoff cosmetics, stale venv detection,
+  Linux notify-send, aplay volume control
+
+
+  Machine-verifiable criteria all pass: 25 hooks, 25 sounds, 25 WAVs, valid
+  JSON, correct WAV format.

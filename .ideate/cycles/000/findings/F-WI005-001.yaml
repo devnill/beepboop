@@ -1,0 +1,17 @@
+id: F-WI005-001
+type: finding
+work_item: WI-005
+verdict: Pass
+summary: "All 25 WAV files generated correctly. One significant finding fixed: generate.sh used bare pip/synth commands that fail on homebrew Python."
+critical: []
+significant:
+  - id: S1
+    title: generate.sh broken on homebrew Python (externally-managed environment)
+    file: generate.sh:6-7
+    issue: bare `pip install` and `synth` commands fail on macOS homebrew Python 3.14+ due to externally-managed environment restriction. Script exits with error on the primary development platform.
+    fix: "Replaced with local venv approach: `python3 -m venv .venv --quiet` (if not exists), then `.venv/bin/pip install` and `.venv/bin/synth generate`. .venv/ is already in .gitignore. Fixed inline."
+minor: []
+unmet_criteria: []
+content_hash: 5d01d80a4bc5cba76a25d14189d54373456670b1722a05256d36ee626364f6ec
+token_count: 197
+file_path: .ideate/cycles/000/findings/F-WI005-001.yaml

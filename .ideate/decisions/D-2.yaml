@@ -1,0 +1,13 @@
+id: D-2
+type: domain_decision
+domain: sound-design
+title: Convention-Based 1:1 Hook-to-Sound Naming
+decision: Hook event names (e.g. SessionStart, Stop) are used as keys in sounds.py, as WAV filenames, in hooks.json, and in settings.json — a single naming convention across all four artifacts.
+rationale: Eliminates mapping layers and makes it trivially easy to trace any event through the full system.
+source: architect analysis
+status: settled
+cycle_created: 0
+cycle_modified: null
+content_hash: 58b566a4b3b61ddd51ae711c59ba5606fb429b48d76b208826e51021f627813f
+token_count: 121
+file_path: .ideate/decisions/D-2.yaml

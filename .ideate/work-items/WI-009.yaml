@@ -1,0 +1,45 @@
+id: WI-009
+type: work_item
+title: Fix stop-daemon.sh — wait for daemon exit before removing PID
+status: completed
+complexity: low
+scope:
+  - path: plugin/scripts/stop-daemon.sh
+    op: modify
+depends: []
+blocks: []
+criteria:
+  - "After kill -TERM, script contains a poll loop checking for PID file disappearance [machine: grep for while loop with -f pid_file check]"
+  - "Poll loop runs at most 20 iterations with sleep 0.05 (total ~1 second) [machine: verify i -lt 20 and sleep 0.05]"
+  - 'Script exits 0 if PID file does not exist on entry [machine: grep for [ -f "$pid_file" ] || exit 0]'
+  - rm -f "$pid_file" appears only after the poll loop as a fallback, not immediately after kill [machine]
+  - "socket_path variable is defined from uid [machine: grep for socket_path]"
+domain: plugin-runtime
+notes: |-
+  ## Objective
+  Wait for daemon to exit after SIGTERM before removing PID file. The daemon's own _cleanup() removes the PID file; this script removes it only as a fallback after ~1 second.
+
+  ## Implementation
+  Replace entire script body:
+  ```sh
+  #!/bin/sh
+  uid=$(python3 -c 'import os; print(os.getuid())')
+  pid_file="/tmp/beepboop-${uid}.pid"
+  socket_path="/tmp/beepboop-${uid}.sock"
+  [ -f "$pid_file" ] || exit 0
+  pid=$(cat "$pid_file")
+  kill -TERM "$pid" 2>/dev/null || true
+  # Wait for daemon to exit (it removes PID file in its own cleanup)
+  i=0
+  while [ $i -lt 20 ] && [ -f "$pid_file" ]; do
+      sleep 0.05; i=$((i+1))
+  done
+  # Fallback: remove PID file if daemon didn't clean up
+  rm -f "$pid_file"
+  ```
+resolution: Poll loop waits up to 1s for daemon to remove PID file after SIGTERM. rm -f only as fallback after loop.
+cycle_created: 1
+cycle_modified: 0
+content_hash: 8282b2772efe22b81a95665c11b988aa21ec7489724e1d03097dad06be0dd5dc
+token_count: 423
+file_path: /Users/dan/code/beepboop/.ideate/work-items/WI-009.yaml

@@ -1,0 +1,63 @@
+id: WI-002
+type: work_item
+title: Update play-sound.sh to use mixing daemon on macOS
+status: pending
+complexity: medium
+scope:
+  - path: plugin/scripts/play-sound.sh
+    op: modify
+depends:
+  - WI-001
+blocks:
+  - WI-005
+criteria:
+  - On macOS, play-sound.sh sends JSON request to daemon socket instead of spawning afplay directly [machine]
+  - On non-macOS platforms, existing audio player code path is unchanged [machine]
+  - If daemon socket does not exist, play-sound.sh starts the daemon and waits up to 500ms for socket before sending request [machine]
+  - play-sound.sh exits immediately after sending the request (fire-and-forget — GP-05) [machine]
+  - If daemon fails to start within 500ms, play-sound.sh exits 0 silently (graceful degradation — GP-03) [machine]
+  - Volume and sounds_enabled values from settings.json are read and passed in the JSON request [machine]
+domain: plugin-runtime
+notes: |-
+  ## Objective
+  On macOS, replace the direct `afplay ... &` invocation with a daemon client call. Leave non-macOS paths unchanged.
+
+  ## Platform Branch
+  Existing play-sound.sh already detects OS via `uname`. Replace only the macOS/afplay branch.
+
+  ## Sending a Request
+  Use inline python3 (already a dependency):
+  ```sh
+  python3 -c "
+  import socket, json, sys
+  d = json.dumps({'path': sys.argv[1], 'volume': float(sys.argv[2])}).encode()
+  s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+  s.connect(sys.argv[3])
+  s.sendall(d + b'\n')
+  s.close()
+  " "$sound_file" "$volume" "$socket_path" &
+  ```
+  Run with `&` to satisfy GP-05.
+
+  ## Auto-Start Logic
+  ```sh
+  uid=$(python3 -c 'import os; print(os.getuid())')
+  socket_path="/tmp/beepboop-${uid}.sock"
+  if [ ! -S "$socket_path" ]; then
+      python3 "${PLUGIN_DIR}/scripts/beepboop-daemon.py" &
+      i=0
+      while [ $i -lt 10 ] && [ ! -S "$socket_path" ]; do
+          sleep 0.05; i=$((i+1))
+      done
+      [ -S "$socket_path" ] || exit 0
+  fi
+  ```
+
+  ## Plugin Directory
+  `PLUGIN_DIR` should already be resolvable from `$0`. Use `$(cd "$(dirname "$0")/.." && pwd)` if not already defined.
+resolution: null
+cycle_created: 0
+cycle_modified: null
+content_hash: 5b8b99daa278f50880af9bc77749e355d9dacd5b06d1d8a4400afb6eb3c0316a
+token_count: 533
+file_path: /Users/dan/code/beepboop/.ideate/work-items/WI-002.yaml

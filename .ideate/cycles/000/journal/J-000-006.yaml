@@ -1,0 +1,18 @@
+id: J-000-006
+type: journal_entry
+phase: execute
+date: 2026-03-29
+cycle_created: 0
+title: work-item-complete
+content: >-
+  ## [execute] 2026-03-29 — Work item WI-005: Regenerate WAV files for all 25
+  hooks
+
+  Status: complete with rework
+
+  Rework: 1 significant finding fixed — generate.sh used bare pip/synth commands
+  that fail on homebrew Python. Fixed to use local .venv (already gitignored).
+  All 25 WAV files present and valid (16-bit PCM, 44100 Hz). 7 new files:
+  StopFailure.wav (56K), TaskCreated.wav (19K), PostCompact.wav (38K),
+  CwdChanged.wav (9.5K), FileChanged.wav (7.8K), Elicitation.wav (37K),
+  ElicitationResult.wav (22K).

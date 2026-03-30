@@ -1,0 +1,14 @@
+id: Q-1
+type: domain_question
+domain: sound-design
+title: Synth Submodule vs. Vendored Dependency
+question: Should the synth library remain a git submodule (requiring submodule init on clone) or be vendored inline or distributed differently?
+source: architect analysis
+impact: Affects contributor setup friction and whether the synth library can evolve independently from beepboop.
+status: open
+reexamination_trigger: When a contributor reports submodule setup issues, or when synth is updated and a coordinated release is needed.
+cycle_created: 0
+cycle_modified: null
+content_hash: b63d81f81b13d0e4fecf58ab84cde61b72426beffe75d327b4aaab86ab2f4fa7
+token_count: 142
+file_path: .ideate/questions/Q-1.yaml

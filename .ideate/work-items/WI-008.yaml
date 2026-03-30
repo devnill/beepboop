@@ -1,0 +1,48 @@
+id: WI-008
+type: work_item
+title: Fix hooks.json — unconditional SessionEnd chain and StopFailure notification
+status: completed
+complexity: low
+scope:
+  - path: plugin/hooks/hooks.json
+    op: modify
+depends: []
+blocks: []
+criteria:
+  - SessionEnd hook command uses ; to separate play-sound.sh, sleep 0.3, and stop-daemon.sh (no && in SessionEnd command) [machine]
+  - "StopFailure hook command chains notify.sh with message 'Task failed' [machine: grep for notify.sh in StopFailure entry]"
+  - StopFailure hook timeout is 10 [machine]
+  - hooks.json is valid JSON (python3 -c "import json; json.load(open('plugin/hooks/hooks.json'))" exits 0) [machine]
+  - All hooks other than SessionEnd and StopFailure are unchanged [machine]
+domain: plugin-runtime
+notes: |-
+  ## SessionEnd (S3)
+  Change SessionEnd command from:
+    play-sound.sh SessionEnd && sleep 0.3 && stop-daemon.sh
+  to:
+    play-sound.sh SessionEnd; sleep 0.3; stop-daemon.sh
+
+  Use semicolons for unconditional chaining so stop-daemon.sh always runs.
+
+  ## StopFailure notification (MR1)
+  Change StopFailure hook entry to:
+  ```json
+  "StopFailure": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "${CLAUDE_PLUGIN_ROOT}/scripts/play-sound.sh StopFailure && ${CLAUDE_PLUGIN_ROOT}/scripts/notify.sh 'Claude Code' 'Task failed'",
+          "timeout": 10
+        }
+      ]
+    }
+  ]
+  ```
+  The && is intentional — notification is conditional on sound succeeding, consistent with the Stop hook pattern.
+resolution: SessionEnd uses semicolons for unconditional chaining. StopFailure chains notify.sh 'Task failed' with timeout 10.
+cycle_created: 1
+cycle_modified: 0
+content_hash: a377e517ba1ff44f903ebfac180386bbe7070f675c093c0ba131c4b0c499d9e0
+token_count: 416
+file_path: /Users/dan/code/beepboop/.ideate/work-items/WI-008.yaml

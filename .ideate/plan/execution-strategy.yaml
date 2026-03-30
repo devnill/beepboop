@@ -1,0 +1,25 @@
+id: execution-strategy
+type: execution_strategy
+mode: batched_parallel
+max_parallelism: 7
+worktrees: false
+review_cadence: incremental per work item
+rationale: All 7 work items touch different files with no overlapping scope. Full parallelism is safe.
+groups:
+  - group: 1
+    items:
+      - WI-006
+      - WI-007
+      - WI-008
+      - WI-009
+      - WI-010
+      - WI-011
+      - WI-012
+    note: All independent — execute in parallel
+dependency_graph: No dependencies between WI-006 through WI-012. All can start immediately.
+agent_config:
+  model: sonnet
+  max_turns_per_item: 20
+content_hash: 8d5fc2a795359625fccd06e3fa692e45ecd5ed9160d1e892e1cc99ecd19f919f
+token_count: 146
+file_path: .ideate/plan/execution-strategy.yaml

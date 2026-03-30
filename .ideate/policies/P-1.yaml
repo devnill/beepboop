@@ -1,0 +1,14 @@
+id: P-1
+type: domain_policy
+domain: sound-design
+title: Synthesized Robotic Sound Character
+rule: "All sounds must be synthesized (not recorded) and carry a robotic personality — melodic tones, chirps, and bleeps in the R2D2 register; no natural sounds or generic beeps. Sounds for error and urgent-attention events may be more alarmed or tense in character."
+derived_from: GP-01 (Pleasant, Robotic Sound Character)
+established: init phase
+status: active
+amended_by: "WI-012"
+cycle_created: 0
+cycle_modified: 1
+content_hash: cfc23a77296690405c2cebc0be6486746fcaa2711fa5bf9231497c1ad25aa4e5
+token_count: 111
+file_path: .ideate/policies/P-1.yaml

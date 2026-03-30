@@ -1,0 +1,35 @@
+id: interview-init-001
+type: interview
+cycle_created: 0
+phase: init
+date: 2026-03-29
+context: Init session for beepboop, a publicly distributed Claude Code plugin. Codebase surveyed by architect before interview. Interview focused on project purpose, guiding principles, and constraints.
+entries:
+  - id: IQ-init-001-001
+    question: What's the intended user and goal for beepboop? Is this a personal tool, something you distribute publicly, or both — and what's the core value you want it to deliver?
+    answer: Beepboop is a publicly available Claude Code plugin. It hooks into every Claude Code hook event and plays a unique sound for each one. The core value is an audio indicator of what Claude is doing without having to look at the tab. It also hooks into on-screen notification tools to alert the user when Claude needs their attention.
+    domain: plugin-runtime
+    seq: 1
+  - id: IQ-init-001-002
+    question: What are the 2-4 most important principles that should guide decisions on this project?
+    answer: 1. Pleasant, robotic sounds — think R2D2 from Star Wars, cheerful non-verbal robot character. 2. Clear, helpful on-screen notifications. 3. Wide compatibility across devices with graceful degradation. 4. Low friction setup.
+    domain: null
+    seq: 2
+  - id: IQ-init-001-003
+    question: Any hard constraints — things that are non-negotiable?
+    answer: Nothing specific.
+    domain: null
+    seq: 3
+  - id: IQ-init-001-004
+    question: Clarification on GP-01 sound character.
+    answer: Although the bias is toward cheerful, urgent alerts, errors, etc. may sound more alarmed. This is acceptable — the emotional register should match the event.
+    domain: sound-design
+    seq: 4
+  - id: IQ-init-001-005
+    question: Any additional principles?
+    answer: Beepboop must not slow down or degrade Claude Code's performance. Hooks must be fire-and-forget/async.
+    domain: plugin-runtime
+    seq: 5
+content_hash: 216d692021be0cf866c7f71bb1b189a145675074cf15daf6e5c85ade292408b3
+token_count: 482
+file_path: .ideate/interviews/interview-init-001.yaml

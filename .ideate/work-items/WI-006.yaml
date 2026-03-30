@@ -1,0 +1,60 @@
+id: WI-006
+type: work_item
+title: Fix beepboop-daemon.py — TOCTOU race and code quality
+status: completed
+complexity: medium
+scope:
+  - path: plugin/scripts/beepboop-daemon.py
+    op: modify
+depends: []
+blocks: []
+criteria:
+  - "Function _elapsed_samples is absent from beepboop-daemon.py [machine: grep -c '_elapsed_samples' returns 0]"
+  - "_pending_start_sample does not appear anywhere in beepboop-daemon.py — no declaration, assignment, or global reference [machine: grep -c '_pending_start_sample' returns 0]"
+  - os._exit(0) appears exactly twice inside _daemonize() — once after each fork's if pid > 0 branch [machine]
+  - sys.exit(0) does not appear inside _daemonize() [machine]
+  - os.chdir('/') appears in _daemonize() after os.setsid() and before the second os.fork() [machine]
+  - "After _daemonize() returns and before os.unlink(_SOCK_PATH), a probe-connect block is present: if connect succeeds, daemon exits immediately; if FileNotFoundError or ConnectionRefusedError, proceeds with unlink [machine: verify logic exists]"
+  - Daemon still writes its PID file and binds the socket after changes — no removal of PID-write or socket-bind logic [machine]
+domain: plugin-runtime
+notes: |-
+  ## Objective
+  Fix a critical TOCTOU race in daemon startup plus remove dead code, replace sys.exit with os._exit in fork parents, and add chdir('/').
+
+  ## TOCTOU fix (C1)
+  In main(), immediately after _daemonize() call and before os.unlink(_SOCK_PATH), insert a probe-connect block:
+
+  ```python
+  _probe = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+  try:
+      _probe.connect(_SOCK_PATH)
+      _probe.close()
+      sys.exit(0)  # Live daemon exists — this instance exits.
+  except (FileNotFoundError, ConnectionRefusedError):
+      pass
+  except OSError:
+      pass
+  finally:
+      try:
+          _probe.close()
+      except Exception:
+          pass
+  ```
+
+  ## Dead code removal (M1, M2)
+  - Delete _elapsed_samples() function (lines 115-121)
+  - Delete _pending_start_sample global declaration (line 109)
+  - Remove _pending_start_sample from global statement in _start_afplay (line 144)
+  - Delete assignment _pending_start_sample = 0 (line 165)
+
+  ## os._exit in fork parents (M3)
+  In _daemonize(), replace both sys.exit(0) calls (lines 294 and 302) with os._exit(0).
+
+  ## chdir('/') (M5)
+  In _daemonize(), after os.setsid() and before the second fork, add os.chdir('/').
+resolution: TOCTOU probe-connect block inserted after _daemonize(). Dead code removed (_elapsed_samples, _pending_start_sample). os._exit(0) replaces sys.exit(0) in fork parents. os.chdir('/') added after setsid().
+cycle_created: 1
+cycle_modified: 0
+content_hash: e8a87abd0e594969ecabb56b1efbd064c8db743c024481d0ab240e4da436f6f0
+token_count: 661
+file_path: /Users/dan/code/beepboop/.ideate/work-items/WI-006.yaml

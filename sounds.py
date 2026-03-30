@@ -146,6 +146,73 @@ def session_end() -> np.ndarray:
     return seq(fall, silence(0.04), boop) * 0.85
 
 
+def stop_failure() -> np.ndarray:
+    """Glitchy descending minor sequence — alarmed, tense, clearly worse than stop."""
+    duration = 0.28
+    t = _t(duration)
+    # Detuned buzz layer for glitch texture
+    buzz = np.sign(np.sin(2 * np.pi * 180 * t)) + 0.4 * np.sign(np.sin(2 * np.pi * 187 * t))
+    buzz /= 1.4
+    # Rapid stutter pulse at 14 Hz
+    pulse = 0.5 + 0.5 * np.sign(np.sin(2 * np.pi * 14 * t))
+    env = adsr(np.ones(len(t)), 0.002, 0.03, 0.65, 0.08)
+    glitch = buzz * pulse * env
+    # Minor descending notes after the glitch burst
+    note1 = adsr(fm(370, 370, 4, 0.14), 0.005, 0.04, 0.5, 0.05)
+    note2 = adsr(fm(220, 220, 4, 0.18), 0.005, 0.06, 0.4, 0.08)
+    return seq(glitch, silence(0.02), note1, silence(0.025), note2)
+
+
+def task_created() -> np.ndarray:
+    """Short ascending two-note chirp — lighter and brighter than task_completed."""
+    note1 = adsr(sine(480, 0.09), 0.004, 0.04, 0.3, 0.03)
+    note2 = adsr(sine(720, 0.11), 0.004, 0.05, 0.2, 0.04)
+    return seq(note1, silence(0.025), note2)
+
+
+def post_compact() -> np.ndarray:
+    """Resolution tone — bookend to pre_compact, rising settle after compression."""
+    duration = 0.30
+    t = _t(duration)
+    freqs = np.linspace(300, 600, len(t))
+    # Gentle wobble that fades out (settling, not frantic)
+    wobble = 20 * np.sin(2 * np.pi * 10 * t) * np.exp(-t / 0.15)
+    phase = 2 * np.pi * np.cumsum(freqs + wobble) / SAMPLE_RATE
+    warble = adsr(np.sin(phase), 0.005, 0.06, 0.5, 0.12)
+    # Bright confirming ping at the end
+    ping = adsr(sine(660, 0.12) + 0.2 * sine(1320, 0.12), 0.003, 0.04, 0.3, 0.06)
+    return seq(warble, silence(0.02), ping)
+
+
+def cwd_changed() -> np.ndarray:
+    """Very short directional blip — a quick step to a new place (≤150ms)."""
+    # Two-tone upward flick: ~110ms total
+    lo = adsr(sine(500, 0.05), 0.002, 0.03, 0.0, 0.015)
+    hi = adsr(sine(750, 0.05), 0.002, 0.025, 0.0, 0.02)
+    return seq(lo, silence(0.01), hi) * 0.65
+
+
+def file_changed() -> np.ndarray:
+    """Very short soft ping — watched file touched (≤150ms)."""
+    # Single soft sine ping with quick decay: ~90ms
+    return adsr(sine(1100, 0.09) + 0.15 * sine(2200, 0.09), 0.002, 0.025, 0.0, 0.06) * 0.55
+
+
+def elicitation() -> np.ndarray:
+    """Rising inquisitive FM tone — MCP awaiting input, held attentively."""
+    note1 = adsr(fm(360, 360, 2.5, 0.16), 0.005, 0.05, 0.55, 0.06)
+    # Rise to a higher, slightly brighter FM note held a moment
+    note2 = adsr(fm(540, 540, 2.5, 0.24), 0.005, 0.06, 0.60, 0.10)
+    return seq(note1, silence(0.03), note2)
+
+
+def elicitation_result() -> np.ndarray:
+    """Short affirmative two-tone resolution — answer received, carry on."""
+    note1 = adsr(fm(540, 540, 2, 0.11), 0.004, 0.04, 0.4, 0.04)
+    note2 = adsr(sine(660, 0.13), 0.004, 0.05, 0.3, 0.05)
+    return seq(note1, silence(0.02), note2)
+
+
 SOUNDS = {
     "SessionStart":         session_start,
     "UserPromptSubmit":     user_prompt_submit,
@@ -165,4 +232,11 @@ SOUNDS = {
     "WorktreeRemove":       worktree_remove,
     "PreCompact":           pre_compact,
     "SessionEnd":           session_end,
+    "StopFailure":          stop_failure,
+    "TaskCreated":          task_created,
+    "PostCompact":          post_compact,
+    "CwdChanged":           cwd_changed,
+    "FileChanged":          file_changed,
+    "Elicitation":          elicitation,
+    "ElicitationResult":    elicitation_result,
 }

@@ -1,0 +1,12 @@
+id: F-WI002-001
+type: finding
+work_item: WI-002
+verdict: Pass
+summary: play-sound.sh correctly routes macOS through daemon IPC. All non-macOS paths unchanged. All criteria satisfied.
+critical: []
+significant: []
+minor: []
+unmet_criteria: []
+content_hash: 46262b969b18fe39ebdb5c3063de01e9d3c540783ff4ae0ad109d26ffde421d6
+token_count: 60
+file_path: .ideate/cycles/000/findings/F-WI002-001.yaml

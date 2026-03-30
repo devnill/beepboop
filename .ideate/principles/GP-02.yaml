@@ -1,0 +1,11 @@
+id: GP-02
+type: guiding_principle
+name: Clear, Helpful On-Screen Notifications
+status: active
+description: On-screen notifications should communicate actionable information clearly. When Claude needs user attention, the notification should make it obvious what requires action. Notifications are not decorative — they carry functional signal. This principle guides decisions about notification content, timing, and which hook events warrant a notification vs. a sound-only response. Prefer specificity over brevity when specificity aids the user's response.
+amendment_history: []
+cycle_created: 0
+cycle_modified: null
+content_hash: 673cd9cee9c669c45aea87c4acd3028822f814b7b61f6dfe4be8dd4e6269e34d
+token_count: 154
+file_path: .ideate/principles/GP-02.yaml

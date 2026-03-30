@@ -1,0 +1,13 @@
+id: GP-01
+type: guiding_principle
+name: Pleasant, Robotic Sound Character
+status: active
+description: Sounds should evoke a cheerful, non-verbal robot personality — think R2D2 from Star Wars. The default bias is toward pleasant, melodic, synthesized tones. However, sounds for error, warning, and urgent-attention events may be more alarmed or tense in character; this is intentional and acceptable. The key constraint is that all sounds remain synthesized and robotic in nature — no harsh digital noise, no natural sounds, no generic system beeps. The emotional register of each sound should match the semantic weight of the event it represents.
+amendment_history:
+  - date: 2026-03-29
+    note: Clarified that alarmed/urgent sounds are acceptable for error and attention-required events; the principle governs robotic character, not uniformly cheerful tone.
+cycle_created: 0
+cycle_modified: null
+content_hash: 52c22e88968efdd13fb2e5507101beee9ac22af6d79b2530510fee51364af1c3
+token_count: 224
+file_path: .ideate/principles/GP-01.yaml

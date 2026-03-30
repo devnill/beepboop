@@ -1,0 +1,11 @@
+id: GP-06
+type: guiding_principle
+name: Complete Hook Coverage
+status: active
+description: Every Claude Code hook event must have a corresponding sound in beepboop. No event goes unheard. This is a core invariant of the plugin — if Claude Code adds new hook events, beepboop must be updated to cover them. Completeness is non-negotiable; selective coverage undermines the plugin's core premise of being a full audio layer over Claude Code's lifecycle.
+amendment_history: []
+cycle_created: 0
+cycle_modified: null
+content_hash: 894d6b0eea2ab9b3879e973e7d4c317238efc3a93d81bfdfc7a86d092c7b3d4b
+token_count: 128
+file_path: .ideate/principles/GP-06.yaml

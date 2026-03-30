@@ -1,0 +1,100 @@
+id: J-000-010
+type: journal_entry
+phase: execute
+date: 2026-03-29
+cycle_created: 0
+title: cycle-complete
+content: >-
+  ## [execute] 2026-03-29 — Cycle 1 execution complete
+
+
+  Work items completed: WI-006, WI-007, WI-008, WI-009, WI-010, WI-011, WI-012
+  (7 total)
+
+  All incremental reviews: Pass
+
+  All acceptance criteria: Satisfied (machine-verified)
+
+
+  ### Changes delivered
+
+
+  **WI-006 — beepboop-daemon.py TOCTOU + cleanup**
+
+  - Probe-connect block inserted after _daemonize() prevents duplicate daemons
+  when concurrent hook invocations race on startup
+
+  - Dead code removed: _elapsed_samples(), _pending_start_sample global and all
+  references
+
+  - os._exit(0) replaces sys.exit(0) in both fork parents (prevents
+  atexit/buffer-flush races)
+
+  - os.chdir('/') added after setsid() for proper daemon hygiene
+
+
+  **WI-007 — play-sound.sh GP-05 compliance**
+
+  - Entire macOS afplay path (daemon startup, socket poll, IPC send) moved into
+  ( ... ) 2>/dev/null & background subshell
+
+  - play-sound.sh now returns immediately on macOS — fully fire-and-forget
+
+  - IPC client wrapped in try/except Exception: pass — silent failure on any
+  socket error
+
+  - $PLAYER caching uses sys.argv[2] instead of shell interpolation (injection
+  fix)
+
+  - Accepted trade-off: first sound on cold daemon start may not play
+
+
+  **WI-008 — hooks.json correctness**
+
+  - SessionEnd: && → ; for unconditional stop-daemon.sh execution
+
+  - StopFailure: added notify.sh chain with 'Task failed', timeout raised to 10
+
+
+  **WI-009 — stop-daemon.sh graceful shutdown**
+
+  - Poll loop waits up to 1s for daemon to remove its own PID file after SIGTERM
+
+  - rm -f only as fallback, not immediate — avoids racing with daemon cleanup
+
+
+  **WI-010 — settings.json coverage**
+
+  - 7 missing hook_sounds entries added: StopFailure, TaskCreated, PostCompact,
+  CwdChanged, FileChanged, Elicitation, ElicitationResult
+
+  - settings.json now has 25 entries matching all registered hooks
+
+
+  **WI-011 — test-sounds.sh + .pyc**
+
+  - 7 new hooks added to HOOKS array (total 25)
+
+  - beepboop-daemon.cpython-314.pyc untracked from git
+
+
+  **WI-012 — Documentation + P-1 policy**
+
+  - README: 18 → 25 hooks; Audio Daemon section added (socket/PID paths,
+  start/stop commands)
+
+  - P-1.yaml: rule amended to permit alarmed/tense sounds for error events;
+  amended_by=WI-012
+
+
+  ### Deferred (future cycle)
+
+  - WAV format validation in daemon before array creation
+
+  - SessionEnd sleep 0.3 vs actual sound duration alignment
+
+  - Linux volume control for aplay/pw-play
+
+  - generate.sh stale venv detection
+
+  - Linux notify-send path hardening

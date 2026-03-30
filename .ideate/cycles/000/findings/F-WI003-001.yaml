@@ -1,0 +1,12 @@
+id: F-WI003-001
+type: finding
+work_item: WI-003
+verdict: Pass
+summary: hooks.json has 25 entries, all 7 new hooks present, SessionEnd chains stop-daemon.sh. stop-daemon.sh handles all edge cases correctly.
+critical: []
+significant: []
+minor: []
+unmet_criteria: []
+content_hash: c3ad139d4883ce30376ceb8fff219b0c1f35356583a1042ba4ed1f8b36a2d136
+token_count: 66
+file_path: .ideate/cycles/000/findings/F-WI003-001.yaml

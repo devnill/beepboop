@@ -1,0 +1,11 @@
+id: GP-05
+type: guiding_principle
+name: Zero Performance Impact on Claude Code
+status: active
+description: "Beepboop must never slow down or degrade Claude Code's performance. All hook invocations must be fire-and-forget: audio playback and notifications must run asynchronously in the background and must not block the hook script's exit. This principle governs all runtime implementation decisions — any new script, capability, or integration must not add synchronous latency to the hook execution path. If a feature cannot be made async, it must not be added."
+amendment_history: []
+cycle_created: 0
+cycle_modified: null
+content_hash: e255b6beb05ea80151988f2165f51908052a0a280a7b37edccc85d74d76beb91
+token_count: 156
+file_path: .ideate/principles/GP-05.yaml

@@ -1,0 +1,11 @@
+id: GP-03
+type: guiding_principle
+name: Wide Compatibility with Graceful Degradation
+status: active
+description: "Beepboop should work across macOS, Linux, and WSL, and across different terminal emulators and multiplexers. When a capability is unavailable on a given platform (e.g., no notification support, no audio player), the plugin should degrade silently without errors or disruption. This principle governs decisions about platform-specific code paths: always provide a fallback, never block the Claude Code session on an unavailable feature, and never surface audio or notification failures to the user as errors."
+amendment_history: []
+cycle_created: 0
+cycle_modified: null
+content_hash: bdadf567a9bbcba86df92fd5629079056c02bfd1956012b12d8c454accd99ec3
+token_count: 170
+file_path: .ideate/principles/GP-03.yaml

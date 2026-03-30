@@ -1,0 +1,14 @@
+id: P-4
+type: domain_policy
+domain: configuration
+title: Defaults Work Out of the Box
+rule: Shipped defaults in settings.json must produce a working experience on macOS and Linux without any user modification after install.
+derived_from: GP-04 (Low Friction Setup)
+established: init phase
+status: active
+amended_by: null
+cycle_created: 0
+cycle_modified: null
+content_hash: e2f718d24b136c5ccae5366d9fd11c504ab5faa23dd46851fc356b51fb4a0a62
+token_count: 89
+file_path: .ideate/policies/P-4.yaml

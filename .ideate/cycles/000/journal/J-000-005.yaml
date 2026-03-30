@@ -1,0 +1,15 @@
+id: J-000-005
+type: journal_entry
+phase: execute
+date: 2026-03-29
+cycle_created: 0
+title: work-item-complete
+content: >-
+  ## [execute] 2026-03-29 — Work item WI-003: hooks.json changes +
+  stop-daemon.sh
+
+  Status: complete
+
+  7 new hook entries added (25 total). SessionEnd chains stop-daemon.sh with
+  0.3s sleep. stop-daemon.sh created, exits 0 gracefully if daemon not running.
+  No findings.

@@ -1,0 +1,105 @@
+id: research-claude-code-hooks
+type: research
+cycle_created: 0
+topic: Claude Code Hook Events — Complete List
+date: 2026-03-29
+summary: Official docs list 25 hook events. Beepboop implements 18. All 18 current beepboop hooks are valid and correctly named. 7 events are missing.
+findings:
+  total_official_events: 25
+  beepboop_implemented: 18
+  missing_events:
+    - StopFailure
+    - TaskCreated
+    - PostCompact
+    - CwdChanged
+    - FileChanged
+    - Elicitation
+    - ElicitationResult
+  all_events:
+    - name: SessionStart
+      trigger: Session begins or resumes
+      in_beepboop: true
+    - name: SessionEnd
+      trigger: Session terminates
+      in_beepboop: true
+    - name: UserPromptSubmit
+      trigger: User submits a prompt, before Claude processes it
+      in_beepboop: true
+    - name: PreToolUse
+      trigger: Before a tool call executes (can block)
+      in_beepboop: true
+    - name: PostToolUse
+      trigger: After a tool call succeeds
+      in_beepboop: true
+    - name: PostToolUseFailure
+      trigger: After a tool call fails
+      in_beepboop: true
+    - name: PermissionRequest
+      trigger: When a permission dialog would appear
+      in_beepboop: true
+    - name: Stop
+      trigger: Claude finishes responding
+      in_beepboop: true
+    - name: StopFailure
+      trigger: Turn ends due to an API error (output/exit code ignored)
+      in_beepboop: false
+    - name: Notification
+      trigger: Claude Code sends a notification
+      in_beepboop: true
+    - name: SubagentStart
+      trigger: A subagent is spawned
+      in_beepboop: true
+    - name: SubagentStop
+      trigger: A subagent finishes
+      in_beepboop: true
+    - name: TaskCreated
+      trigger: A task is being created via TaskCreate
+      in_beepboop: false
+    - name: TaskCompleted
+      trigger: A task is marked as completed
+      in_beepboop: true
+    - name: TeammateIdle
+      trigger: An agent team teammate is about to go idle
+      in_beepboop: true
+    - name: PreCompact
+      trigger: Before context compaction
+      in_beepboop: true
+    - name: PostCompact
+      trigger: After context compaction completes
+      in_beepboop: false
+    - name: InstructionsLoaded
+      trigger: A CLAUDE.md or .claude/rules/*.md file is loaded into context
+      in_beepboop: true
+    - name: ConfigChange
+      trigger: A configuration file changes during a session
+      in_beepboop: true
+    - name: CwdChanged
+      trigger: Working directory changes
+      in_beepboop: false
+    - name: FileChanged
+      trigger: A watched file changes on disk
+      in_beepboop: false
+    - name: WorktreeCreate
+      trigger: A worktree is being created
+      in_beepboop: true
+    - name: WorktreeRemove
+      trigger: A worktree is being removed
+      in_beepboop: true
+    - name: Elicitation
+      trigger: An MCP server requests user input during a tool call
+      in_beepboop: false
+    - name: ElicitationResult
+      trigger: User responds to an MCP elicitation, before response is sent back
+      in_beepboop: false
+  risks:
+    - StopFailure output and exit code are ignored per docs — sound still plays but hook cannot influence behavior
+    - FileChanged and CwdChanged could fire rapidly — risk of sound spam without rate limiting
+    - PostCompact and PreCompact firing in quick succession may overlap
+    - StopFailure, TaskCreated, PostCompact, CwdChanged, FileChanged, Elicitation, ElicitationResult were all added March 2026 — may be unstable
+  handler_note: All missing events support the command handler type, which beepboop uses exclusively. No compatibility issues.
+sources:
+  - https://code.claude.com/docs/en/hooks
+  - https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md
+content_hash: f828a269751a3425dcdb984128708312d3275360ae3d8303097fd0f03056317c
+token_count: 925
+file_path: .ideate/steering/research/research-claude-code-hooks.yaml

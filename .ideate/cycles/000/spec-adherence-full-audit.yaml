@@ -1,0 +1,21 @@
+id: spec-adherence-full-audit
+type: cycle_summary
+scope: full-audit
+date: "20260329"
+reviewer: spec-reviewer
+verdict: Pass (one significant finding)
+content: |-
+  ## All WI acceptance criteria met. All GPs and policies adhered to.
+
+  ## Significant
+  SIG-1: settings.json hook_sounds missing 7 new hooks — fallback path incomplete; /beepboop:config show displays broken table (P-4)
+
+  ## Minor
+  MIN-1: sleep 0.3 in SessionEnd undocumented in WI-003
+  MIN-2: beepboop-daemon.cpython-314.pyc committed to repo — version-locked bytecode should be gitignored
+
+  ## Policy note
+  P-1 text prohibits harsh alarms; GP-01 was amended to allow alarmed sounds for error events. Implementation follows GP-01. P-1 text should be updated to reflect the amendment.
+content_hash: a9884036fd995eb345a4aef769cb972d0af10c75db8d8fcfa24c9a744d1b2b40
+token_count: 188
+file_path: .ideate/cycles/000/spec-adherence-full-audit.yaml

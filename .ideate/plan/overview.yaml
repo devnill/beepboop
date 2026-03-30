@@ -1,0 +1,32 @@
+id: overview
+type: overview
+title: Cycle 1 — Review Findings Correction
+trigger: Full-audit review (2026-03-29) identified 1 critical finding, 6 significant findings, and 6 minor findings across 6 source files.
+scope_in:
+  - plugin/scripts/beepboop-daemon.py
+  - plugin/scripts/play-sound.sh
+  - plugin/scripts/stop-daemon.sh
+  - plugin/hooks/hooks.json
+  - plugin/settings.json
+  - plugin/scripts/test-sounds.sh
+  - README.md
+  - .ideate/policies/P-1.yaml
+  - .gitignore
+scope_out:
+  - sounds.py (no sound changes)
+  - synth/ submodule (no build changes)
+  - plugin/sounds/*.wav (no regeneration needed)
+  - notify.sh (no changes)
+  - generate.sh (no changes)
+summary: Fix the daemon TOCTOU startup race (C1), make daemon startup fully non-blocking in play-sound.sh (S1), add silent error handling to IPC client (S2), fix SessionEnd hook chain to use semicolons (S3), fix stop-daemon.sh to wait for daemon exit (S4), wire StopFailure to notify.sh (MR1), complete settings.json with 7 missing hooks (II1), update test-sounds.sh to cover all 25 hooks, untrack committed .pyc, update README for 25 hooks and daemon docs, and amend P-1 policy to match GP-01.
+work_items:
+  - WI-006
+  - WI-007
+  - WI-008
+  - WI-009
+  - WI-010
+  - WI-011
+  - WI-012
+content_hash: c079652135db3d423348e8dd483c820a29137847e51673a5262c527f43d6e9bb
+token_count: 311
+file_path: .ideate/plan/overview.yaml

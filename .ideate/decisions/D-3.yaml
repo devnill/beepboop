@@ -1,0 +1,13 @@
+id: D-3
+type: domain_decision
+domain: plugin-runtime
+title: Silent Exit on Failure
+decision: All runtime scripts exit 0 on missing inputs, disabled features, or unavailable system binaries — no errors are surfaced to the user.
+rationale: Upholds the graceful degradation principle; a missing audio player or notification tool should not disrupt the Claude Code session.
+source: architect analysis
+status: settled
+cycle_created: 0
+cycle_modified: null
+content_hash: 6475fc88e4a01fb18ceb1ffc85019f29612799e983c16f34164c73533b4afd53
+token_count: 112
+file_path: .ideate/decisions/D-3.yaml

@@ -1,0 +1,11 @@
+id: GP-04
+type: guiding_principle
+name: Low Friction Setup
+status: active
+description: "Installation and configuration of beepboop should require as few steps as possible. Defaults should work out of the box for the majority of users. Configuration should be accessible via a slash command rather than requiring manual file editing. This principle governs decisions about onboarding, default values, and required dependencies: prefer bundled assets over runtime dependencies, prefer auto-detection over manual configuration, and minimize the number of steps between 'install' and 'working'."
+amendment_history: []
+cycle_created: 0
+cycle_modified: null
+content_hash: e113e35b9749a64c9904c5f001eb08acdd59ff0ff78be5897aa75acd358d6111
+token_count: 163
+file_path: .ideate/principles/GP-04.yaml

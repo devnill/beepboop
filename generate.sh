@@ -3,7 +3,12 @@
 set -e
 cd "$(dirname "$0")"
 
-pip install -e synth/ -q          # installs synth as editable package (fast on repeat runs)
-synth generate --config synth.toml
+# Use a local venv to avoid conflicts with system/homebrew Python.
+if [ ! -d ".venv" ]; then
+  python3 -m venv .venv --quiet
+fi
+
+.venv/bin/pip install -e synth/ -q
+.venv/bin/synth generate --config synth.toml
 
 echo "Done. WAV files written to plugin/sounds/"

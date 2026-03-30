@@ -1,0 +1,17 @@
+id: F-WI001-001
+type: finding
+work_item: WI-001
+verdict: Pass
+summary: Daemon implementation is correct. One minor non-idiomatic array clear fixed inline.
+critical: []
+significant: []
+minor:
+  - id: M1
+    title: Non-idiomatic array clear in _reap closure
+    file: plugin/scripts/beepboop-daemon.py:177
+    issue: _pending.__init__("h") is non-standard for clearing an array in-place; functionally works in CPython but undocumented behavior.
+    fix: Changed to del _pending[:] — idiomatic in-place clear. Fixed inline.
+unmet_criteria: []
+content_hash: 8cebe4eae43b8ec207ffa6675b93f6fe8c4bfb55cd3e25b55a66f9a78c0e7267
+token_count: 135
+file_path: .ideate/cycles/000/findings/F-WI001-001.yaml

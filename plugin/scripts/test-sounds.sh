@@ -22,6 +22,13 @@ HOOKS=(
   WorktreeRemove
   PreCompact
   SessionEnd
+  StopFailure
+  TaskCreated
+  PostCompact
+  CwdChanged
+  FileChanged
+  Elicitation
+  ElicitationResult
 )
 
 for HOOK in "${HOOKS[@]}"; do

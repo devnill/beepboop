@@ -1,0 +1,63 @@
+id: WI-003
+type: work_item
+title: "All hooks.json changes: add 7 hooks and wire SessionEnd daemon shutdown"
+status: pending
+complexity: medium
+scope:
+  - path: plugin/hooks/hooks.json
+    op: modify
+  - path: plugin/scripts/stop-daemon.sh
+    op: create
+depends:
+  - WI-001
+  - WI-004
+blocks:
+  - WI-005
+criteria:
+  - "hooks.json contains entries for all 7 missing events: StopFailure, TaskCreated, PostCompact, CwdChanged, FileChanged, Elicitation, ElicitationResult [machine]"
+  - Each new entry maps to play-sound.sh with the hook name as argument [machine]
+  - hooks.json total hook count is 25 [machine]
+  - SessionEnd hook entry chains stop-daemon.sh after play-sound.sh [machine]
+  - stop-daemon.sh exists and sends SIGTERM to daemon PID from /tmp/beepboop-$UID.pid [machine]
+  - stop-daemon.sh exits 0 if PID file does not exist or process is not running [machine]
+  - JSON is valid and parseable [machine]
+domain: plugin-runtime
+notes: |-
+  ## Objective
+  Two changes to hooks.json in one work item (to avoid concurrent scope collision): (1) add all 7 missing hook events, (2) update SessionEnd to also stop the mixing daemon.
+
+  ## New Hook Entries
+  All 7 follow the standard sound-only pattern (no notify.sh chaining):
+  ```json
+  "StopFailure": { "hooks": [{ "type": "command", "command": "<scripts_dir>/play-sound.sh StopFailure" }] },
+  "TaskCreated": { "hooks": [{ "type": "command", "command": "<scripts_dir>/play-sound.sh TaskCreated" }] },
+  "PostCompact": { "hooks": [{ "type": "command", "command": "<scripts_dir>/play-sound.sh PostCompact" }] },
+  "CwdChanged":  { "hooks": [{ "type": "command", "command": "<scripts_dir>/play-sound.sh CwdChanged" }] },
+  "FileChanged": { "hooks": [{ "type": "command", "command": "<scripts_dir>/play-sound.sh FileChanged" }] },
+  "Elicitation": { "hooks": [{ "type": "command", "command": "<scripts_dir>/play-sound.sh Elicitation" }] },
+  "ElicitationResult": { "hooks": [{ "type": "command", "command": "<scripts_dir>/play-sound.sh ElicitationResult" }] }
+  ```
+  Match the exact command format used by existing entries (examine hooks.json for the real path pattern).
+
+  ## SessionEnd Update
+  Current SessionEnd command: `<scripts_dir>/play-sound.sh SessionEnd`
+  Updated: `<scripts_dir>/play-sound.sh SessionEnd && sleep 0.3 && <scripts_dir>/stop-daemon.sh`
+
+  The sleep gives the daemon time to finish playing the SessionEnd sound before SIGTERM.
+
+  ## stop-daemon.sh
+  ```sh
+  #!/bin/sh
+  uid=$(python3 -c 'import os; print(os.getuid())')
+  pid_file="/tmp/beepboop-${uid}.pid"
+  [ -f "$pid_file" ] || exit 0
+  pid=$(cat "$pid_file")
+  kill -TERM "$pid" 2>/dev/null || true
+  rm -f "$pid_file"
+  ```
+resolution: null
+cycle_created: 0
+cycle_modified: null
+content_hash: 68548c4f7b7c471a9ecb64d84cc645d65f01a52c3ab051c59a3f98f518255bc7
+token_count: 679
+file_path: /Users/dan/code/beepboop/.ideate/work-items/WI-003.yaml

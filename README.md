@@ -4,7 +4,7 @@ A Claude Code plugin that plays sounds on every hook event and sends Ghostty OSC
 
 ## Features
 
-- Plays a distinct sound for each of the 18 Claude Code hook events
+- Plays a distinct sound for each of the 25 Claude Code hook events
 - Sends desktop notifications (via Ghostty OSC 777) when Claude finishes a task or needs input
 - Configurable via `/beepboop:config` skill
 - Auto-detects an available audio player on first run (macOS: `afplay`, Linux: `aplay`/`paplay`/`pw-play`, WSL: Linux players or `powershell.exe`)
@@ -50,3 +50,26 @@ Notifications work across multiple terminals with automatic detection:
 - **Ghostty** — OSC 777 (requires `desktop-notifications = true` in `~/.config/ghostty/config`)
 - **VSCode, iTerm2, WezTerm** — OSC 9 escape sequence
 - **Other terminals on macOS** — `osascript` system notification (clicking focuses your terminal app, not Script Editor)
+
+## Audio Daemon (macOS)
+
+On macOS, beepboop uses a persistent audio mixing daemon (`beepboop-daemon.py`) to prevent audio corruption when multiple hooks fire in quick succession. Instead of spawning multiple `afplay` processes, all sounds are mixed into a single stream.
+
+- **Socket**: `/tmp/beepboop-<uid>.sock`
+- **PID file**: `/tmp/beepboop-<uid>.pid`
+- Auto-starts on the first hook event that plays a sound
+- Automatically stopped on `SessionEnd`
+
+### Manual management
+
+Check if running:
+```sh
+ps aux | grep beepboop-daemon
+```
+
+Stop manually:
+```sh
+kill $(cat /tmp/beepboop-$(id -u).pid)
+```
+
+The daemon auto-starts on the next hook event.

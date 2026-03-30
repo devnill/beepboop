@@ -1,0 +1,72 @@
+id: WI-007
+type: work_item
+title: Fix play-sound.sh — non-blocking daemon start, silent IPC errors, safe player caching
+status: completed
+complexity: medium
+scope:
+  - path: plugin/scripts/play-sound.sh
+    op: modify
+depends: []
+blocks: []
+criteria:
+  - "The main script body does not contain a synchronous socket-poll loop — the daemon-start and IPC-send are inside a background subshell [machine: verify poll loop is inside ( ... ) &]"
+  - "The entire macOS afplay case block wraps daemon-start, socket-poll, and IPC-send in a single background subshell: ( ... ) 2>/dev/null & [machine]"
+  - "The inline python3 socket client contains try: and except Exception: with pass [machine: grep for try: and except Exception in afplay case]"
+  - "$PLAYER is passed as sys.argv[2] in the caching block and is NOT interpolated into the python3 source string [machine: verify '$PLAYER' literal not inside python3 -c string; verify sys.argv[2] used]"
+  - Player-caching python3 call receives $SETTINGS as first arg and $PLAYER as second arg after the -c script [machine]
+  - Non-macOS code paths (paplay, aplay, pw-play, powershell) are unchanged [machine]
+domain: plugin-runtime
+notes: |-
+  ## Objective
+  Make the macOS daemon-startup path fully non-blocking, add exception handling to IPC client, fix $PLAYER shell-interpolation in caching block.
+
+  ## Non-blocking daemon startup (S1) + Silent IPC errors (S2)
+  Replace the current afplay) case block (lines 73-91) with:
+
+  ```sh
+  afplay)
+      uid=$(python3 -c 'import os; print(os.getuid())')
+      socket_path="/tmp/beepboop-${uid}.sock"
+      (
+        if [ ! -S "$socket_path" ]; then
+          python3 "${PLUGIN_ROOT}/scripts/beepboop-daemon.py" &
+          i=0
+          while [ $i -lt 10 ] && [ ! -S "$socket_path" ]; do
+            sleep 0.05; i=$((i+1))
+          done
+          [ -S "$socket_path" ] || exit 0
+        fi
+        python3 -c "
+  import socket, json, sys
+  try:
+      d = json.dumps({'path': sys.argv[1], 'volume': float(sys.argv[2])}).encode()
+      s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+      s.connect(sys.argv[3])
+      s.sendall(d + b'\n')
+      s.close()
+  except Exception:
+      pass
+  " "$SOUND" "$VOLUME" "$socket_path"
+      ) 2>/dev/null &
+      ;;
+  ```
+
+  ## Safe $PLAYER caching (M6)
+  Replace the player-caching python3 block (lines 58-63):
+  ```sh
+      python3 -c "
+  import json, sys
+  with open(sys.argv[1]) as f: cfg = json.load(f)
+  cfg['player'] = sys.argv[2]
+  with open(sys.argv[1], 'w') as f: json.dump(cfg, f, indent=2)
+  " "$SETTINGS" "$PLAYER" 2>/dev/null
+  ```
+
+  ## Design note
+  uid and socket_path computation stays outside the subshell (fast, pure). Daemon start, poll, and IPC send go inside ( ... ) 2>/dev/null &. Accepted trade-off: first sound on cold start (SessionStart) may not play if daemon isn't ready in time.
+resolution: afplay case block fully wrapped in background subshell ( ... ) 2>/dev/null &. IPC client wrapped in try/except Exception. $PLAYER caching uses sys.argv[2] instead of shell interpolation.
+cycle_created: 1
+cycle_modified: 0
+content_hash: 17eb9a4b505fdb69f4610fa020dc18a59662280a38de7d3d9e926c6aef09b7bc
+token_count: 769
+file_path: /Users/dan/code/beepboop/.ideate/work-items/WI-007.yaml

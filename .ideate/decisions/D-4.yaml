@@ -1,0 +1,13 @@
+id: D-4
+type: domain_decision
+domain: plugin-runtime
+title: Audio Player Auto-Detection with Caching
+decision: The audio player (afplay/aplay/paplay/pw-play/powershell) is detected once via platform checks and the result is cached in settings.json.
+rationale: Avoids per-invocation detection overhead and allows users to override the detected player without modifying scripts.
+source: architect analysis
+status: settled
+cycle_created: 0
+cycle_modified: null
+content_hash: 9cc4daa24755d64b203ef8da2a5b3eb41bc424794ff35724b67daf74088885b1
+token_count: 114
+file_path: .ideate/decisions/D-4.yaml

@@ -1,0 +1,14 @@
+id: P-5
+type: domain_policy
+domain: plugin-runtime
+title: Async-Only Hook Execution
+rule: All audio playback and notification dispatch must run in the background (fire-and-forget); hook scripts must never block waiting for playback or notification delivery to complete.
+derived_from: GP-05 (Zero Performance Impact on Claude Code)
+established: init phase
+status: active
+amended_by: null
+cycle_created: 0
+cycle_modified: null
+content_hash: 8eec5cded864d1963db14667d8fce3771ebda451845fc8ae613eae8f3739ba5a
+token_count: 106
+file_path: .ideate/policies/P-5.yaml

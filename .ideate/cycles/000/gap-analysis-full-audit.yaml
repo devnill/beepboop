@@ -1,0 +1,23 @@
+id: gap-analysis-full-audit
+type: cycle_summary
+scope: full-audit
+date: "20260329"
+reviewer: gap-analyst
+verdict: Fail
+content: |-
+  ## Missing Requirements
+  MR1: StopFailure not wired to notify.sh (Stop fires notification; failure counterpart does not)
+
+  ## Significant
+  EC1: Failed daemon start causes 0.5s stall on every subsequent hook in the session — GP-05 violation
+  II1: settings.json missing 7 new hook fallback entries — config display broken
+  II2: test-sounds.sh missing all 7 new hooks — only manual QA tool, new sounds unverifiable
+  MI1: README still says 18 hooks; daemon architecture undocumented
+
+  ## Minor
+  MI2: P-1 policy text not updated to reflect GP-01 alarmed-sounds amendment
+  EC2-EC4: WAV format validation, SessionEnd cutoff, stale venv — all defer
+  IR1-IR2: Linux notify-send, aplay volume — defer as known limitations
+content_hash: 03efc64ad6ed25564c7b220c839e462a2bfe1b341177e9e4dbc778803aa152dd
+token_count: 213
+file_path: .ideate/cycles/000/gap-analysis-full-audit.yaml

@@ -1,0 +1,32 @@
+id: WI-007-review
+type: finding
+work_item: WI-007
+reviewer: incremental
+verdict: pass
+findings:
+  critical: []
+  significant: []
+  minor: []
+self_check_verification:
+  - criterion: Daemon-start and IPC-send inside background subshell
+    status: satisfied
+    verified: true
+  - criterion: Entire afplay case wrapped in ( ... ) 2>/dev/null &
+    status: satisfied
+    verified: true
+  - criterion: IPC python3 client contains try/except Exception with pass
+    status: satisfied
+    verified: true
+  - criterion: $PLAYER passed as sys.argv[2] not interpolated into string
+    status: satisfied
+    verified: true
+  - criterion: Caching call receives $SETTINGS as first arg, $PLAYER as second
+    status: satisfied
+    verified: true
+  - criterion: Non-macOS paths unchanged (paplay, aplay, pw-play, powershell)
+    status: satisfied
+    verified: true
+notes: Background subshell confirmed at line 96. try/except at lines 87/93. sys.argv[2] for player caching confirmed at line 61. $PLAYER not interpolated into python3 source string. GP-05 fire-and-forget fully satisfied — play-sound.sh returns immediately on macOS.
+content_hash: a4edbdfeb1813709fb8f43832c549999237e437d1cf24f31dc17ffedff66014f
+token_count: 279
+file_path: .ideate/cycles/001/findings/WI-007-review.yaml

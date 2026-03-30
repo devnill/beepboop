@@ -1,0 +1,13 @@
+id: D-6
+type: domain_decision
+domain: configuration
+title: Single JSON Settings File
+decision: All user-configurable settings (sounds_enabled, notifications_enabled, volume, player, hook_sounds) are stored in a single plugin/settings.json file.
+rationale: Centralizes configuration, simplifies the /beepboop:config slash command implementation, and keeps the plugin self-contained.
+source: architect analysis
+status: settled
+cycle_created: 0
+cycle_modified: null
+content_hash: 93e587a47c62d8484c35621f955ebb146e66e67845ca28bbc6c6e369cb58c33b
+token_count: 115
+file_path: .ideate/decisions/D-6.yaml

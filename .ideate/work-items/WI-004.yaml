@@ -1,0 +1,59 @@
+id: WI-004
+type: work_item
+title: Design 7 new sounds for missing hook events
+status: pending
+complexity: medium
+scope:
+  - path: sounds.py
+    op: modify
+depends: []
+blocks:
+  - WI-003
+  - WI-005
+criteria:
+  - "sounds.py contains 7 new sound functions: stop_failure, task_created, post_compact, cwd_changed, file_changed, elicitation, elicitation_result [machine]"
+  - All 7 are registered in SOUNDS dict with PascalCase hook names as keys [machine]
+  - SOUNDS dict has exactly 25 entries [machine]
+  - Each function returns np.ndarray and uses only existing synth primitives [machine]
+  - StopFailure sound is distinctly more alarmed/tense than Stop [human]
+  - CwdChanged and FileChanged are short (under 200ms) and non-intrusive [human]
+  - Elicitation sounds inquisitive/attentive; ElicitationResult sounds like a received answer [human]
+  - TaskCreated is clearly distinct from TaskCompleted; PostCompact from PreCompact [human]
+  - All sounds maintain robotic/synthesized character per GP-01 [human]
+domain: sound-design
+notes: |-
+  ## Objective
+  Add 7 new sound design functions to sounds.py following existing patterns.
+
+  ## Event Character Guidelines
+
+  | Hook | Semantic | Character |
+  |------|----------|-----------|
+  | StopFailure | Session ended via API error | Descending glitch/minor, alarmed — clearly different from Stop |
+  | TaskCreated | Task being created | Short ascending chirp, lighter than TaskCompleted |
+  | PostCompact | Compaction complete | Resolution tone, bookend to PreCompact |
+  | CwdChanged | Directory changed | Very short (≤150ms) directional blip |
+  | FileChanged | Watched file changed | Very short (≤150ms) soft tick/ping |
+  | Elicitation | MCP awaiting input | Rising inquisitive tone, held slightly |
+  | ElicitationResult | MCP input received | Short affirmative resolution |
+
+  ## Implementation Pattern
+  Each sound is a zero-arg function returning np.ndarray. Follow the pattern of existing sounds in sounds.py (examine the file for style and use of `sine`, `sweep`, `fm`, `adsr`, `seq`, `silence`, `SAMPLE_RATE`, `_t`). Import of `_t` is already present at line 10.
+
+  ## SOUNDS Dict
+  Append to the existing SOUNDS dict:
+  ```python
+  'StopFailure': stop_failure,
+  'TaskCreated': task_created,
+  'PostCompact': post_compact,
+  'CwdChanged': cwd_changed,
+  'FileChanged': file_changed,
+  'Elicitation': elicitation,
+  'ElicitationResult': elicitation_result,
+  ```
+resolution: null
+cycle_created: 0
+cycle_modified: null
+content_hash: ee04927ad9dc71d8f8851b57929ebea82a9c16523b52519dda7431d743ea0908
+token_count: 619
+file_path: /Users/dan/code/beepboop/.ideate/work-items/WI-004.yaml

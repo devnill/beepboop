@@ -1,0 +1,25 @@
+id: interview-refine-1
+type: interview
+cycle_created: 1
+phase: refine
+date: 2026-03-29
+context: Post-review correction cycle. Full-audit review identified 1 critical, 6 significant, and 6 minor findings.
+entries:
+  - id: IQ-refine-1-001
+    question: Are guiding principles GP-01 through GP-06 still valid?
+    answer: Yes, all principles still apply unchanged.
+    domain: null
+    seq: 1
+  - id: IQ-refine-1-002
+    question: Are you here to address the review findings, make other changes, or both?
+    answer: Address all review findings.
+    domain: null
+    seq: 2
+  - id: IQ-refine-1-003
+    question: Fixing S1 (500ms blocking wait) requires moving daemon startup entirely to a background subshell, which means the first sound (SessionStart) may not play on a cold start. Is losing the first sound on cold start acceptable?
+    answer: Yes, that is acceptable.
+    domain: plugin-runtime
+    seq: 3
+content_hash: 3985acb968895548126fdba682d314de2b7a847c582fbe147f32b616569557fa
+token_count: 226
+file_path: .ideate/interviews/interview-refine-1.yaml

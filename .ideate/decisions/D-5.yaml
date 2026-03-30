@@ -1,0 +1,13 @@
+id: D-5
+type: domain_decision
+domain: plugin-runtime
+title: Selective Notification Triggering
+decision: Only Stop and permission/idle-prompt Notification hook events trigger on-screen notifications; all other events play sound only.
+rationale: Notifications are reserved for events that require user attention; frequent events (file edits, tool calls) would create notification fatigue.
+source: architect analysis
+status: settled
+cycle_created: 0
+cycle_modified: null
+content_hash: 88f381b708c02ed53082df951ff3e3b9d50b9068def8d11459665216eb24cce5
+token_count: 117
+file_path: .ideate/decisions/D-5.yaml

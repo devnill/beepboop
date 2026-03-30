@@ -1,6 +1,6 @@
 {
   "name": "beepboop",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "Plays sounds on hooks and sends notifications when Claude needs attention",
   "author": { "name": "dan" },
   "license": "MIT"

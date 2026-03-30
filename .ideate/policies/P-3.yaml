@@ -1,0 +1,14 @@
+id: P-3
+type: domain_policy
+domain: plugin-runtime
+title: No Runtime Python Package Dependencies
+rule: The plugin runtime must not require user-installed Python packages; only bundled WAV files and system-available binaries (afplay, aplay, python3, osascript, etc.) may be used at runtime.
+derived_from: GP-04 (Low Friction Setup)
+established: init phase
+status: active
+amended_by: null
+cycle_created: 0
+cycle_modified: null
+content_hash: d7b4970a8e0aa9cab8dae9812d98937a0cb5b766e5f8296ba504c898cee28327
+token_count: 106
+file_path: .ideate/policies/P-3.yaml

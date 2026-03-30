@@ -1,0 +1,40 @@
+id: interview-refine-0
+type: interview
+cycle_created: 0
+phase: refine
+date: 2026-03-29
+context: "First refinement cycle for beepboop. No prior review findings. Three areas of work: hook coverage audit, audio mixing architecture, and adherence audit."
+entries:
+  - id: IQ-refine-0-001
+    question: Do the existing guiding principles still apply?
+    answer: Yes, all five still hold.
+    domain: null
+    seq: 1
+  - id: IQ-refine-0-002
+    question: What changes do you want to make in this cycle?
+    answer: 1. Verify all Claude Code hooks are captured and add any missing ones with new sounds. 2. Fix the macOS garbled audio issue caused by multiple simultaneous afplay processes. 3. Full audit of the app for adherence to principles and domain policies.
+    domain: null
+    seq: 2
+  - id: IQ-refine-0-003
+    question: "Research found 7 missing hooks: StopFailure, TaskCreated, PostCompact, CwdChanged, FileChanged, Elicitation, ElicitationResult. CwdChanged and FileChanged can fire frequently. Include all, or skip the noisy/niche ones?"
+    answer: Include all. Every hook must have a sound. Completeness is a very important principle.
+    domain: sound-design
+    seq: 3
+  - id: IQ-refine-0-004
+    question: Under heavy load (many hooks firing rapidly), how should the audio queue behave? Sequential with backlog, bounded/drop oldest, or debounce?
+    answer: Don't want a long backlog. Prefer combining sounds so multiple waveforms play at once as a single stream — real-time audio mixing.
+    domain: plugin-runtime
+    seq: 4
+  - id: IQ-refine-0-005
+    question: Should the mixing daemon be macOS-only or replace the audio player on all platforms?
+    answer: macOS only for now. The code path in play-sound.sh may change depending on the daemon architecture, but Linux/WSL keep the existing approach.
+    domain: plugin-runtime
+    seq: 5
+  - id: IQ-refine-0-006
+    question: "Daemon lifecycle: start with SessionStart (but daemon must be running before that sound plays) or auto-start on first request?"
+    answer: Auto-start on first request. This also handles resuming sessions where SessionStart has already fired.
+    domain: plugin-runtime
+    seq: 6
+content_hash: 53205ae045f417f27b842285d6c8c2991d4bf844929abcd48822a8b392f97b85
+token_count: 543
+file_path: .ideate/interviews/interview-refine-0.yaml

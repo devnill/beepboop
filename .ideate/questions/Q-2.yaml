@@ -1,0 +1,14 @@
+id: Q-2
+type: domain_question
+domain: plugin-runtime
+title: Notification Event Coverage
+question: Should any hook events beyond Stop and permission/idle-prompt Notification trigger on-screen notifications in the future?
+source: init phase
+impact: Determines the notification surface area — too few events reduces utility, too many causes notification fatigue.
+status: open
+reexamination_trigger: When a user requests notification support for a specific event, or when new Claude Code hook events are added.
+cycle_created: 0
+cycle_modified: null
+content_hash: cf227a73a3526df8eec5eb875e47effbe5e5a810cd53fe50fa86628d861b8bf0
+token_count: 136
+file_path: .ideate/questions/Q-2.yaml

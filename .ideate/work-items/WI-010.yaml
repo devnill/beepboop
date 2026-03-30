@@ -1,0 +1,38 @@
+id: WI-010
+type: work_item
+title: Add 7 new hooks to settings.json hook_sounds
+status: completed
+complexity: low
+scope:
+  - path: plugin/settings.json
+    op: modify
+depends: []
+blocks: []
+criteria:
+  - "hook_sounds in settings.json contains exactly 25 entries [machine: python3 -c \"import json; d=json.load(open('plugin/settings.json')); print(len(d['hook_sounds']))\" outputs 25]"
+  - "All 7 new keys present: StopFailure, TaskCreated, PostCompact, CwdChanged, FileChanged, Elicitation, ElicitationResult [machine: grep each]"
+  - Each new key maps to a non-empty /System/Library/Sounds/*.aiff path [machine]
+  - Existing 18 entries unchanged [machine]
+  - settings.json is valid JSON [machine]
+domain: configuration
+notes: |-
+  ## Objective
+  Add 7 missing hooks to hook_sounds so /beepboop:config show displays all 25 hooks and the fallback audio path is complete.
+
+  ## Values to add (after SessionEnd entry)
+  ```json
+  "StopFailure":       "/System/Library/Sounds/Basso.aiff",
+  "TaskCreated":       "/System/Library/Sounds/Tink.aiff",
+  "PostCompact":       "/System/Library/Sounds/Ping.aiff",
+  "CwdChanged":        "/System/Library/Sounds/Tink.aiff",
+  "FileChanged":       "/System/Library/Sounds/Tink.aiff",
+  "Elicitation":       "/System/Library/Sounds/Glass.aiff",
+  "ElicitationResult": "/System/Library/Sounds/Ping.aiff"
+  ```
+  Maintain the same indentation and column-alignment style as existing entries.
+resolution: All 7 new hook_sounds entries added. settings.json now has 25 entries covering all hooks.
+cycle_created: 1
+cycle_modified: 0
+content_hash: 9b1c011c68d0ea4798936b65b38301653b1f54311c317ab0017adcf4893c0796
+token_count: 390
+file_path: /Users/dan/code/beepboop/.ideate/work-items/WI-010.yaml

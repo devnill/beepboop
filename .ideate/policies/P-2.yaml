@@ -1,0 +1,14 @@
+id: P-2
+type: domain_policy
+domain: plugin-runtime
+title: Silent Failure on Missing Capabilities
+rule: Every platform-specific code path must have a silent fallback; audio and notification failures must never surface as errors or block the Claude Code session.
+derived_from: GP-03 (Wide Compatibility with Graceful Degradation)
+established: init phase
+status: active
+amended_by: null
+cycle_created: 0
+cycle_modified: null
+content_hash: ea181abb043cb8f01221aef924168c1e81d67173e4ca9a09a86b4d0226fb1c56
+token_count: 105
+file_path: .ideate/policies/P-2.yaml
