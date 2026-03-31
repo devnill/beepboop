@@ -1,4 +1,6 @@
 {
-  "schema_version": 2,
-  "project_name": "beepboop"
+  "schema_version": 3,
+  "project_name": "beepboop",
+  "circuit_breaker_threshold": 5,
+  "default_appetite": 6
 }

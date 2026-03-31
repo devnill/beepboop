@@ -1,0 +1,24 @@
+id: PH-001
+type: phase
+phase_type: implementation
+project: PR-001
+status: active
+
+intent: |-
+  Retroactive phase grouping all existing work items. Contains the full history
+  of the workspace prior to the project/phase hierarchy introduction.
+
+work_items:
+  - WI-001
+  - WI-002
+  - WI-003
+  - WI-004
+  - WI-005
+  - WI-006
+  - WI-007
+  - WI-008
+  - WI-009
+  - WI-010
+  - WI-011
+  - WI-012
+
