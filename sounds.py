@@ -213,6 +213,60 @@ def elicitation_result() -> np.ndarray:
     return seq(note1, silence(0.02), note2)
 
 
+def setup() -> np.ndarray:
+    """Priming sequence — two low tones then a rising sweep, like subsystems powering up."""
+    tone1 = adsr(sine(300, 0.08), 0.005, 0.05, 0.0, 0.02)
+    tone2 = adsr(sine(400, 0.08), 0.005, 0.05, 0.0, 0.02)
+    rise = adsr(sweep(400, 700, 0.15), 0.005, 0.04, 0.3, 0.06)
+    return seq(tone1, silence(0.02), tone2, silence(0.02), rise)
+
+
+def user_prompt_expansion() -> np.ndarray:
+    """Quick expanding chirp — a slash command unfolding into a prompt."""
+    return adsr(sweep(500, 900, 0.12), 0.003, 0.04, 0.2, 0.03)
+
+
+def message_display() -> np.ndarray:
+    """Barely-perceptible high-frequency tick — streaming text appearing, one dot per batch."""
+    return adsr(sine(1200, 0.03), 0.001, 0.008, 0.0, 0.018) * 0.20
+
+
+def post_tool_batch() -> np.ndarray:
+    """Soft perfect-fifth chord — a full batch of tool calls settled."""
+    return adsr(sine(660, 0.10) + 0.5 * sine(990, 0.10), 0.003, 0.06, 0.0, 0.03)
+
+
+def permission_denied() -> np.ndarray:
+    """Descending square-wave two-note — a firm robotic 'no', not an alarm."""
+    note1 = adsr(square(440, 0.08), 0.003, 0.05, 0.0, 0.02)
+    note2 = adsr(square(330, 0.10), 0.003, 0.06, 0.0, 0.03)
+    return seq(note1, silence(0.02), note2)
+
+
+def pre_model_switch() -> np.ndarray:
+    """Mechanical click + rising anticipation — the robot is about to change modes."""
+    click = adsr(square(200, 0.04), 0.001, 0.02, 0.0, 0.015)
+    rise = adsr(sweep(400, 600, 0.14), 0.003, 0.05, 0.3, 0.05)
+    return seq(click, silence(0.015), rise)
+
+
+def post_model_switch() -> np.ndarray:
+    """Gentle fall + resolved chord — settled into the new mode."""
+    fall = adsr(sweep(600, 500, 0.08), 0.003, 0.04, 0.3, 0.03)
+    chord = adsr(sine(500, 0.10) + 0.3 * sine(750, 0.10), 0.003, 0.06, 0.2, 0.04)
+    return seq(fall, silence(0.015), chord)
+
+
+def directory_added() -> np.ndarray:
+    """Three ascending tones — opening up new territory."""
+    parts = []
+    for freq in [440, 550, 660]:
+        parts.append(adsr(sine(freq, 0.06), 0.003, 0.04, 0.0, 0.02))
+        parts.append(silence(0.015))
+    parts.append(adsr(sine(880, 0.08), 0.003, 0.05, 0.0, 0.03))
+    return seq(*parts)
+
+
 SOUNDS = {
     "SessionStart":         session_start,
     "UserPromptSubmit":     user_prompt_submit,
@@ -239,4 +293,12 @@ SOUNDS = {
     "FileChanged":          file_changed,
     "Elicitation":          elicitation,
     "ElicitationResult":    elicitation_result,
+    "Setup":                setup,
+    "UserPromptExpansion":  user_prompt_expansion,
+    "MessageDisplay":       message_display,
+    "PostToolBatch":        post_tool_batch,
+    "PermissionDenied":     permission_denied,
+    "PreModelSwitch":       pre_model_switch,
+    "PostModelSwitch":      post_model_switch,
+    "DirectoryAdded":       directory_added,
 }

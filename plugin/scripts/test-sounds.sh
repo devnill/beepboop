@@ -5,11 +5,16 @@ PLAY="$SCRIPT_DIR/play-sound.sh"
 
 HOOKS=(
   SessionStart
+  Setup
   UserPromptSubmit
+  UserPromptExpansion
+  MessageDisplay
   PreToolUse
   PermissionRequest
+  PermissionDenied
   PostToolUse
   PostToolUseFailure
+  PostToolBatch
   Notification
   SubagentStart
   SubagentStop
@@ -25,7 +30,10 @@ HOOKS=(
   StopFailure
   TaskCreated
   PostCompact
+  PreModelSwitch
+  PostModelSwitch
   CwdChanged
+  DirectoryAdded
   FileChanged
   Elicitation
   ElicitationResult

@@ -110,9 +110,25 @@ _play_start_time: float = 0.0       # wall time when current afplay started
 # Temp dir for WAV chunks handed to afplay.
 _tmp_dir: str = ""
 
+# Debounce window: sound requests arriving within this many seconds of each
+# other are coalesced into a single mix-and-restart of afplay instead of one
+# restart per request. Under heavy concurrent hook load (many agents firing
+# sounds within milliseconds of each other) restarting afplay dozens of
+# times per second churns the CoreAudio output device fast enough to leave
+# it in a corrupted (staticky/echoing) state.
+_DEBOUNCE_SEC: float = 0.04
+_debounce_pending: list[array.array] = []
+_debounce_timer: threading.Timer | None = None
+
 
 def _kill_afplay() -> None:
-    """Kill the running afplay process (caller holds _lock)."""
+    """Kill the running afplay process and wait for it to exit (caller holds _lock).
+
+    Waiting after kill() (not just terminate()) matters under load: if a new
+    afplay is spawned before the old one has actually released the CoreAudio
+    device, both processes are briefly attached to the output device at
+    once, which is audible as overlapping/echoing playback.
+    """
     global _afplay_proc
     if _afplay_proc is not None:
         try:
@@ -121,6 +137,7 @@ def _kill_afplay() -> None:
         except Exception:
             try:
                 _afplay_proc.kill()
+                _afplay_proc.wait(timeout=1)
             except Exception:
                 pass
         _afplay_proc = None
@@ -173,31 +190,52 @@ def _start_afplay(samples: array.array) -> None:
 
 def _enqueue_sound(path: str, volume: float) -> None:
     """
-    Mix *path* (at *volume*) into the current playback stream.
-    Uses "interrupt and remix": compute remaining samples of current playback,
-    mix in new sound, restart afplay with the combined audio.
+    Queue *path* (at *volume*) to be mixed into the playback stream.
+    Decoding happens immediately; the actual mix-and-restart of afplay is
+    debounced (see _flush_debounce) so that a burst of near-simultaneous
+    requests produces one device restart instead of one per request.
     """
     new_samples = _read_wav_samples(path, volume)
     if not new_samples:
         return
 
+    global _debounce_timer
     with _lock:
+        _debounce_pending.append(new_samples)
+        if _debounce_timer is None:
+            _debounce_timer = threading.Timer(_DEBOUNCE_SEC, _flush_debounce)
+            _debounce_timer.daemon = True
+            _debounce_timer.start()
+
+
+def _flush_debounce() -> None:
+    """
+    Mix every sound queued during the debounce window into one combined
+    buffer, then perform a single "interrupt and remix": compute remaining
+    samples of current playback, mix in the combined new sound, restart
+    afplay once with the result.
+    """
+    global _debounce_timer
+    with _lock:
+        pending = _debounce_pending[:]
+        _debounce_pending.clear()
+        _debounce_timer = None
+        if not pending:
+            return
+
+        combined = pending[0]
+        for s in pending[1:]:
+            combined = _mix_samples(combined, s)
+
         if _afplay_proc is not None and _afplay_proc.poll() is None:
             # Estimate how many samples have been consumed already.
             elapsed = max(0.0, time.monotonic() - _play_start_time)
             consumed = int(elapsed * _SAMPLE_RATE)
-            remaining_start = consumed  # index into _pending
-            if remaining_start < len(_pending):
-                remaining = _pending[remaining_start:]
-            else:
-                remaining = array.array("h")
-            mixed = _mix_samples(remaining, new_samples)
-            _kill_afplay()
-            _start_afplay(mixed)
-        else:
-            # Nothing playing — start fresh.
-            _kill_afplay()
-            _start_afplay(new_samples)
+            remaining = _pending[consumed:] if consumed < len(_pending) else array.array("h")
+            combined = _mix_samples(remaining, combined)
+
+        _kill_afplay()
+        _start_afplay(combined)
 
 
 # ---------------------------------------------------------------------------
@@ -253,6 +291,8 @@ def _cleanup(sock: socket.socket | None = None) -> None:
     """Remove socket and PID files; kill any running afplay."""
     _shutdown.set()
     with _lock:
+        if _debounce_timer is not None:
+            _debounce_timer.cancel()
         _kill_afplay()
     if sock is not None:
         try:

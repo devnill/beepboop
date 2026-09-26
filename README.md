@@ -4,7 +4,7 @@ A Claude Code plugin that plays sounds on every hook event and sends Ghostty OSC
 
 ## Features
 
-- Plays a distinct sound for each of the 25 Claude Code hook events
+- Plays a distinct sound for each of the 33 Claude Code hook events
 - Sends desktop notifications (via Ghostty OSC 777) when Claude finishes a task or needs input
 - Configurable via `/beepboop:config` skill
 - Auto-detects an available audio player on first run (macOS: `afplay`, Linux: `aplay`/`paplay`/`pw-play`, WSL: Linux players or `powershell.exe`)

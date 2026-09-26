@@ -28,6 +28,14 @@
     "CwdChanged":         "/System/Library/Sounds/Tink.aiff",
     "FileChanged":        "/System/Library/Sounds/Tink.aiff",
     "Elicitation":        "/System/Library/Sounds/Glass.aiff",
-    "ElicitationResult":  "/System/Library/Sounds/Ping.aiff"
+    "ElicitationResult":  "/System/Library/Sounds/Ping.aiff",
+    "Setup":              "/System/Library/Sounds/Blow.aiff",
+    "UserPromptExpansion":"/System/Library/Sounds/Tink.aiff",
+    "MessageDisplay":     "/System/Library/Sounds/Tink.aiff",
+    "PostToolBatch":      "/System/Library/Sounds/Ping.aiff",
+    "PermissionDenied":   "/System/Library/Sounds/Basso.aiff",
+    "PreModelSwitch":     "/System/Library/Sounds/Frog.aiff",
+    "PostModelSwitch":    "/System/Library/Sounds/Purr.aiff",
+    "DirectoryAdded":     "/System/Library/Sounds/Sosumi.aiff"
   }
 }

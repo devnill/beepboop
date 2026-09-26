@@ -2,7 +2,7 @@
 
 ## Overview
 
-beepboop plays a distinct synthesized sound for each of Claude Code's 25 hook events. On macOS, audio is routed through a persistent mixing daemon that prevents corruption when multiple hooks fire in rapid succession. On Linux and WSL, sounds are played directly by the shell script using available system players.
+beepboop plays a distinct synthesized sound for each of Claude Code's 33 hook events. On macOS, audio is routed through a persistent mixing daemon that prevents corruption when multiple hooks fire in rapid succession. On Linux and WSL, sounds are played directly by the shell script using available system players.
 
 ---
 
@@ -265,7 +265,7 @@ Sounds are defined in `sounds.py` as NumPy arrays using primitives from the `syn
 
 ```
 synth.toml         ← maps function names to output filenames
-sounds.py          ← 25 synthesis functions + SOUNDS dict
+sounds.py          ← 33 synthesis functions + SOUNDS dict
 synth/             ← submodule: sine, square, sweep, fm, adsr, seq, silence
 generate.sh        ← runs `synth generate` to produce plugin/sounds/*.wav
 ```
@@ -280,7 +280,7 @@ generate.sh        ← runs `synth generate` to produce plugin/sounds/*.wav
 
 ## Hook Coverage
 
-All 25 Claude Code hooks are registered:
+All 33 Claude Code hooks are registered:
 
 | Hook | Character |
 |------|-----------|
@@ -309,3 +309,11 @@ All 25 Claude Code hooks are registered:
 | FileChanged | Short soft sine ping |
 | Elicitation | Rising inquisitive FM 2-note |
 | ElicitationResult | Short affirmative 2-tone resolution |
+| Setup | Low priming tones + rising sweep |
+| UserPromptExpansion | Quick rising expanding sweep |
+| MessageDisplay | Extremely subtle high-frequency tick (per batch) |
+| PostToolBatch | Soft perfect-fifth chord — batch settled |
+| PermissionDenied | Descending square-wave two-note — firm rejection |
+| PreModelSwitch | Mechanical click + rising anticipation |
+| PostModelSwitch | Gentle fall + resolved chord — new mode |
+| DirectoryAdded | Four ascending tones — opening space |

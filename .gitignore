@@ -3,3 +3,16 @@ __pycache__/
 .venv/
 .DS_Store
 
+
+# ideate v3 migration — local only (not tracked)
+.ideate/record/
+.ideate-record/
+.ideate-work/
+.ideate/steering/*.md
+.ideate/.migrated-to-v3.json
+.ideate-telemetry/
+.ideate/
+.ideate.json
+
+# conway — local agent harness state
+.conway/
