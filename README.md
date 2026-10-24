@@ -35,13 +35,12 @@ Use the `/beepboop:config` skill in Claude Code:
 /beepboop:config disable sounds         # turn sounds off
 /beepboop:config enable notifications   # turn notifications on
 /beepboop:config disable notifications   # turn notifications off
-/beepboop:config set Stop Hero           # change Stop hook sound
 /beepboop:config volume 0.5             # set playback volume (0.0–1.0, default 0.2)
 /beepboop:config player /usr/bin/aplay  # override audio player
 /beepboop:config player ""              # reset to auto-detect
 ```
 
-Config file: `~/.claude/plugins/cache/beepboop/beepboop/<version>/settings.json`
+Config file: `~/.claude/plugins/cache/<marketplace>/beepboop/<version>/settings.json`
 
 ## Notifications
 
@@ -73,3 +72,10 @@ kill $(cat /tmp/beepboop-$(id -u).pid)
 ```
 
 The daemon auto-starts on the next hook event.
+
+## Releasing
+
+1. Bump the version in `plugin/.claude-plugin/plugin.json` and both `marketplace.json` files (`.claude-plugin/` and `plugin/.claude-plugin/`).
+2. Run `scripts/check-versions.sh` to confirm all four version fields agree.
+3. Commit and push.
+4. In the claude-marketplace repo, run `./release.sh sync` and push that.

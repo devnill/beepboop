@@ -38,7 +38,7 @@ Claude Code hook fires
 Hook fires (e.g. PreToolUse)
   │
   └─► play-sound.sh PreToolUse
-        ├─ reads settings.json → sound path, volume
+        ├─ resolves sounds/<HookName>.wav, reads settings.json → volume
         ├─ checks daemon socket exists (/tmp/beepboop-<uid>.sock)
         ├─ spawns background subshell: ( IPC send ) 2>/dev/null &
         └─ returns immediately  ← hook timeout never at risk
@@ -272,9 +272,7 @@ generate.sh        ← runs `synth generate` to produce plugin/sounds/*.wav
 
 `generate.sh` creates a `.venv` if absent, installs `synth` in editable mode, and runs generation. Output WAVs land in `plugin/sounds/` and are committed to the repo — users do not need Python or NumPy to run the plugin.
 
-`play-sound.sh` resolves sounds in priority order:
-1. `plugin/sounds/<HookName>.wav` (bundled WAV — always preferred)
-2. `settings.json["hook_sounds"]["<HookName>"]` (system sound fallback path)
+`play-sound.sh` plays `plugin/sounds/<HookName>.wav` and does nothing if it is absent.
 
 ---
 

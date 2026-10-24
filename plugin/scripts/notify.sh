@@ -1,7 +1,12 @@
 #!/bin/sh
 # Send a desktop notification via OSC escape sequences.
-# Priority: OSC 777 > OSC 9 > osascript (macOS fallback)
+# Priority: OSC 777 (Ghostty) > OSC 9 (iTerm2, WezTerm, VSCode, Hyper)
 # Multiplexers: wraps sequences in DCS passthrough for tmux and GNU screen.
+# macOS fallback: osascript/terminal-notifier fires ONLY when the OSC
+# notification cannot be delivered (no OSC terminal, tmux without
+# allow-passthrough, or the tty write fails). Otherwise it is skipped to
+# avoid duplicate notifications.
+# BEEPBOOP_TTY overrides the tty path (default /dev/tty); used by tests.
 
 TITLE="${1:-Claude Code}"
 BODY="${2:-}"
@@ -30,6 +35,7 @@ in_screen() {
 osc_type() {
     # OSC 777: Ghostty
     [ -n "$GHOSTTY_RESOURCES_DIR" ] && echo "osc777" && return
+    [ "$TERM_PROGRAM" = "ghostty" ] && echo "osc777" && return
     # OSC 9: iTerm2, WezTerm, VSCode, Hyper
     [ "$TERM_PROGRAM" = "iTerm.app" ] && echo "osc9" && return
     [ -n "$WEZTERM_EXECUTABLE" ] && echo "osc9" && return
@@ -44,17 +50,30 @@ build_osc777() { printf '\033]777;notify;%s;%s\a' "$TITLE" "$BODY"; }
 build_osc9()   { printf '\033]9;%s: %s\a' "$TITLE" "$BODY"; }
 
 # --- Output with optional DCS passthrough ---
+# Returns non-zero if the tty write fails. Stderr is suppressed (including the
+# shell's own redirection error).
 
 send_seq() {
     seq="$1"
+    tty="${BEEPBOOP_TTY:-/dev/tty}"
     if in_tmux; then
         # tmux requires inner ESC to be doubled
-        printf '\033Ptmux;\033%s\033\\' "$seq" > /dev/tty
+        { printf '\033Ptmux;\033%s\033\\' "$seq" > "$tty"; } 2>/dev/null
     elif in_screen; then
-        printf '\033P%s\033\\' "$seq" > /dev/tty
+        { printf '\033P%s\033\\' "$seq" > "$tty"; } 2>/dev/null
     else
-        printf '%s' "$seq" > /dev/tty
+        { printf '%s' "$seq" > "$tty"; } 2>/dev/null
     fi
+}
+
+# --- Passthrough check ---
+# tmux (>= 3.3) drops passthrough sequences unless allow-passthrough is on/all.
+
+tmux_passthrough_ok() {
+    case "$(tmux show-options -gv allow-passthrough 2>/dev/null)" in
+        on|all) return 0 ;;
+    esac
+    return 1
 }
 
 # --- macOS fallback ---
@@ -69,17 +88,19 @@ macos_notify() {
 
 # --- Main ---
 
+delivered=1
 TYPE="$(osc_type)"
 case "$TYPE" in
-    osc777) send_seq "$(build_osc777)" ;;
-    osc9)   send_seq "$(build_osc9)" ;;
-    none)   ;;
+    osc777) send_seq "$(build_osc777)" && delivered=0 ;;
+    osc9)   send_seq "$(build_osc9)" && delivered=0 ;;
 esac
+if [ "$delivered" -eq 0 ] && in_tmux && ! tmux_passthrough_ok; then
+    delivered=1
+fi
 
-# On macOS, always fire a system notification as a reliable fallback.
-# OSC passthrough in tmux requires `set -g allow-passthrough on` in .tmux.conf
-# (disabled by default since tmux 3.3), so system notifications are the only
-# guaranteed path inside tmux.
-[ "$(uname)" = "Darwin" ] && macos_notify
+# On macOS, the system notification is a fallback only: fire it when the OSC
+# notification could not be delivered (no OSC terminal, tmux without
+# allow-passthrough on/all, or the tty write failed).
+[ "$delivered" -ne 0 ] && [ "$(uname)" = "Darwin" ] && macos_notify
 
 exit 0
